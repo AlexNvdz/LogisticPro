@@ -18,6 +18,9 @@ jobs:
         with:
           node-version: 18
 
+      - name: Ensure npm is installed
+        run: npm install -g npm
+
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v20
         with:
