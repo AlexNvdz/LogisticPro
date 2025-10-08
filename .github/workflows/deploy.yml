@@ -18,6 +18,9 @@ jobs:
         with:
           node-version: 18
 
+      - name: Ensure npx is available
+        run: npm install -g npx
+
       - name: Deploy to Vercel
         uses: amondnet/vercel-action@v20
         with:
