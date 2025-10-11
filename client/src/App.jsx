@@ -1,3 +1,4 @@
+/*
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
@@ -29,6 +30,35 @@ function App() {
         Click on the Vite and React logos to learn more
       </p>
     </>
+  )
+}
+
+export default App
+*/
+
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import Layout from './layout/layout'
+import Dashboard from './pages/dashboard'
+import Envios from './pages/envios'
+import Rutas from './pages/rutas'
+import Almacenes from './pages/almacenes'
+import Usuarios from './pages/usuarios'
+import './App.css'
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Layout>
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/envios" element={<Envios />} />
+          <Route path="/rutas" element={<Rutas />} />
+          <Route path="/almacenes" element={<Almacenes />} />
+          <Route path="/usuarios" element={<Usuarios />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Layout>
+    </BrowserRouter>
   )
 }
 

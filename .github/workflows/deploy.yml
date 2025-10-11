@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   schedule:
-    - cron: "0 15 * * 5" # Viernes 15:00 UTC
+    - cron: "0 20 * * 6" # Sábado 20:00 UTC (3 pm hora colombiana)
   workflow_dispatch: # Permite ejecutarlo manualmente desde GitHub Actions
 
 jobs:
