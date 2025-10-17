@@ -43,6 +43,7 @@ import Envios from './pages/envios'
 import Rutas from './pages/rutas'
 import Almacenes from './pages/almacenes'
 import Usuarios from './pages/usuarios'
+import Vehiculos from './pages/vehiculos';
 import './App.css'
 
 function App() {
@@ -56,6 +57,7 @@ function App() {
           <Route path="/almacenes" element={<Almacenes />} />
           <Route path="/usuarios" element={<Usuarios />} />
           <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="/vehiculos" element={<Vehiculos />} />
         </Routes>
       </Layout>
     </BrowserRouter>
