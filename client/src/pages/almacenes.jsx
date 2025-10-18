@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import './almacenes.css';
 
+const API = import.meta.env.VITE_API_URL || '';
+
 export default function Almacenes() {
   const [almacenes, setAlmacenes] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -15,7 +17,7 @@ export default function Almacenes() {
   async function fetchAlmacenes() {
     setLoading(true);
     try {
-      const res = await fetch('/warehouses');
+      const res = await fetch(`${API}/warehouses`);
       const data = await res.json();
       setAlmacenes(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -28,7 +30,7 @@ export default function Almacenes() {
   async function crearAlmacen(e) {
     e.preventDefault();
     try {
-      const res = await fetch('/warehouses', {
+      const res = await fetch(`${API}/warehouses`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -56,7 +58,7 @@ export default function Almacenes() {
   async function editarAlmacen(e) {
     e.preventDefault();
     try {
-      const res = await fetch(`/warehouses/${editForm.id}`, {
+      const res = await fetch(`${API}/warehouses/${editForm.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -80,7 +82,7 @@ export default function Almacenes() {
   async function eliminarAlmacen(id) {
     if (!window.confirm('¿Eliminar este almacén?')) return;
     try {
-      const res = await fetch(`/warehouses/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${API}/warehouses/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error(await res.text());
       setAlmacenes(prev => prev.filter(a => a.id !== id));
     } catch (err) {

@@ -1,4 +1,6 @@
 // client/src/pages/usuarios.jsx
+const API = import.meta.env.VITE_API_URL || '';
+
 import './usuarios.css';
 import React, { useEffect, useState } from 'react';
 
@@ -12,7 +14,7 @@ export default function Usuarios() {
   async function fetchClients() {
     setLoading(true);
     try {
-      const res = await fetch('/clients');
+      const res = await fetch(`${API}/clients`);
       const data = await res.json();
       setClients(Array.isArray(data) ? data : []);
     } catch (err) {
@@ -24,7 +26,7 @@ export default function Usuarios() {
   async function createClient(e) {
     e.preventDefault();
     try {
-      const res = await fetch('/clients', {
+      const res = await fetch(`${API}/clients`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form)

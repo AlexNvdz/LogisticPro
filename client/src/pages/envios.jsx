@@ -1,4 +1,6 @@
 // client/src/pages/envios.jsx
+const API = import.meta.env.VITE_API_URL || '';
+
 import './envios.css';
 import React, { useEffect, useState } from 'react';
 
@@ -13,7 +15,10 @@ export default function Envios() {
   async function fetchAll() {
     setLoading(true);
     try {
-      const [oRes, cRes] = await Promise.all([fetch('/orders'), fetch('/clients')]);
+      const [oRes, cRes] = await Promise.all([
+        fetch(`${API}/orders`),
+        fetch(`${API}/clients`)
+      ]);
       const oData = await oRes.json();
       const cData = await cRes.json();
       setOrders(Array.isArray(oData) ? oData : []);
@@ -28,7 +33,11 @@ export default function Envios() {
     e.preventDefault();
     try {
       const payload = { ...form, client_id: Number(form.client_id), weight: Number(form.weight || 0) };
-      const res = await fetch('/orders', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const res = await fetch(`${API}/orders`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
       if (!res.ok) throw new Error(await res.text());
       const created = await res.json();
       setOrders(prev => [created, ...prev]);
