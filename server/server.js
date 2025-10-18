@@ -1,14 +1,23 @@
-// server/src/server.js
+// server/server.js
 require('dotenv').config();
 const express = require('express');
-const pool = require('./src/db/connection'); // ya lo tienes
-const usersRoutes = require('./src/routes/users');
-const clientsRoutes = require('./src/routes/clients');
-const vehiclesRoutes = require('./src/routes/vehicles');
-const ordersRoutes = require('./src/routes/orders');
-const routesRoutes = require('./src/routes/routes');
-const warehousesRoutes = require('./src/routes/warehouses');
-const authRoutes = require('./src/routes/auth');
+const pool = require('./db/connection');
+
+(async () => {
+  try {
+    const r = await pool.query('SELECT 1');
+    console.log('DB connection OK');
+  } catch (err) {
+    console.error('DB connection ERROR', err.message);
+  }
+})();
+const usersRoutes = require('./routes/users');
+const clientsRoutes = require('./routes/clients');
+const vehiclesRoutes = require('./routes/vehicles');
+const ordersRoutes = require('./routes/orders');
+const routesRoutes = require('./routes/routes');
+const warehousesRoutes = require('./routes/warehouses');
+const authRoutes = require('./routes/auth');
 const axios = require('axios');
 const cors = require('cors');
 
@@ -65,3 +74,6 @@ app.get('/db-test', async (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
+
+process.on('uncaughtException', err => console.error('❕Uncaught Exception:', err));
+process.on('unhandledRejection', err => console.error('😈Unhandled Rejection:', err));

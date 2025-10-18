@@ -1,16 +1,19 @@
 // server/src/db/connection.js
-require('dotenv').config();
 const { Pool } = require('pg');
 
+const connectionString = process.env.DATABASE_URL || process.env.DATABASE_URL_LOCAL;
+
 const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: Number(process.env.DB_PORT || 5432),
-  user: process.env.DB_USER || 'loguser',
-  password: process.env.DB_PASS || 'secret',
-  database: process.env.DB_NAME || 'logisticpro',
+  connectionString,
+  // For Render external connections you need SSL. Internal may not, but this is safe:
+  ssl: connectionString ? { rejectUnauthorized: false } : false,
+  // opcional: idleTimeoutMillis, connectionTimeoutMillis
 });
 
-pool.on('connect', () => console.log('✅ Connected to PostgreSQL (pg Pool)'));
-pool.on('error', (err) => console.error('PG Pool error', err));
+pool.on('error', (err) => {
+  console.error('Unexpected error on idle client', err);
+  process.exit(-1);
+});
 
 module.exports = pool;
+
