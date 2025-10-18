@@ -1,7 +1,7 @@
 // server/server.js
 require('dotenv').config();
 const express = require('express');
-const pool = require('./db/connection');
+const pool = require('./src/db/connection');
 
 (async () => {
   try {
