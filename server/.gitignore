@@ -1,6 +1,0 @@
-node_modules
-
-# Ignorar archivos de entorno
-.env
-server/.env
-client/.env

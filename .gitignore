@@ -1,22 +1,22 @@
-# node
+# Node modules
 node_modules/
 npm-debug.log*
 yarn-error.log*
 
-# env
+# Environment files
 .env
 server/.env
 client/.env
 
-# dumps / DB exports (no subir)
+# Database dumps
 *.sql
 dump*.*
 backup*.*
 dump_custom.dump
 
-# build
+# Build outputs
 dist/
 build/
 
-# editor
+# IDE/editor
 .vscode/
