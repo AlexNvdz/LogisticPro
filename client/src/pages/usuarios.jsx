@@ -1,5 +1,5 @@
 // client/src/pages/usuarios.jsx
-const API = import.meta.env.VITE_API_URL || '';
+const API = import.meta.env.VITE_API_URL || 'https://logisticpro.onrender.com';
 
 import './usuarios.css';
 import React, { useEffect, useState } from 'react';

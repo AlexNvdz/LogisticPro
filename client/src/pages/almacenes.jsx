@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import './almacenes.css';
 
-const API = import.meta.env.VITE_API_URL || '';
+const API = import.meta.env.VITE_API_URL || 'https://logisticpro.onrender.com';
 
 export default function Almacenes() {
   const [almacenes, setAlmacenes] = useState([]);
