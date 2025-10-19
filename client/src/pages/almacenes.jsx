@@ -45,6 +45,7 @@ export default function Almacenes() {
       setAlmacenes(prev => [nuevo, ...prev]);
       setForm({ name: '', location: '', capacity: '', manager: '' });
       document.getElementById('form-almacen').style.display = 'none';
+      window.dispatchEvent(new CustomEvent('logistic:data-changed', { detail: { resource: 'warehouses', id: nuevo.id } }));
     } catch (err) {
       alert('Error creando almacén');
     }

@@ -35,6 +35,7 @@ export default function Usuarios() {
       const created = await res.json();
       setClients(prev => [created, ...prev]);
       setForm({ name: '', contact_email: '', contact_phone: '', address: '' });
+      window.dispatchEvent(new CustomEvent('logistic:data-changed', { detail: { resource: 'clients', id: created.id } }));
     } catch (err) {
       console.error('createClient', err);
       alert('Error creando cliente');

@@ -42,6 +42,7 @@ export default function Envios() {
       const created = await res.json();
       setOrders(prev => [created, ...prev]);
       setForm({ tracking_code: '', client_id: '', origin: '', destination: '', weight: '' });
+      window.dispatchEvent(new CustomEvent('logistic:data-changed', { detail: { resource: 'orders', id: created.id } }));
     } catch (err) {
       console.error('createOrder', err);
       alert('Error creando orden');
