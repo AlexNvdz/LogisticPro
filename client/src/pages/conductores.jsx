@@ -1,7 +1,8 @@
+// client/src/pages/usuarios.jsx
+const API = import.meta.env.VITE_API_URL || 'https://logisticpro.onrender.com';
+
 import React, { useEffect, useState } from "react";
 import "./conductores.css";
-
-const API = import.meta.env.VITE_API_URL;
 
 export default function Conductores() {
   const [drivers, setDrivers] = useState([]);

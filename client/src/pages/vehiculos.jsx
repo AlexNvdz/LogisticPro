@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./vehiculos.css";
 
-const API = import.meta.env.VITE_API_URL;
+const API = import.meta.env.VITE_API_URL || 'https://logisticpro.onrender.com';
 
 export default function Vehiculos() {
   const [vehicles, setVehicles] = useState([]);
