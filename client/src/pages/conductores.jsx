@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "../styles/conductores.css";
+import "./conductores.css";
 
 const API = import.meta.env.VITE_API_URL;
 
