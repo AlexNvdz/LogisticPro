@@ -1,29 +1,21 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   server: {
     port: 5173,
+    watch: {
+      usePolling: true
+    },
     proxy: {
-      // proxyea rutas al backend en desarrollo
       '/clients': 'http://localhost:3000',
       '/vehicles': 'http://localhost:3000',
       '/orders': 'http://localhost:3000',
       '/users': 'http://localhost:3000',
       '/db-test': 'http://localhost:3000',
       '/warehouses': 'http://localhost:3000',
-      '/drivers': 'http://localhost:3000' // ✅ agregado para los conductores
+      '/drivers': 'http://localhost:3000', // ✅ agrega esto también
     }
-  },
-  resolve: {
-    alias: {
-      '@': '/src' // ✅ permite importar usando @/pages o @/components
-    }
-  },
-  build: {
-    outDir: 'dist',
-    sourcemap: false
   }
-});
+})
