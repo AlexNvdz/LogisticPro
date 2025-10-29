@@ -1,6 +1,5 @@
-// client/src/pages/dashboard.jsx
 import React, { useEffect, useState, useRef } from 'react';
-import './dashboard.css'; // te doy estilo abajo
+import './dashboard.css';
 
 const API = import.meta.env.VITE_API_URL || 'https://logisticpro.onrender.com';
 
@@ -12,52 +11,57 @@ export default function Dashboard() {
     drivers: 0,
     vehicles: 0,
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const pollingRef = useRef(null);
+  const [lastUpdate, setLastUpdate] = useState(null);
 
   async function fetchCounts() {
-    setLoading(true);
     try {
-      // Llamamos a endpoints existentes y contamos filas (pequeño coste)
+      setLoading(true);
+
+      // Llamadas paralelas a todos los recursos
       const [ordersRes, clientsRes, warehousesRes, driversRes, vehiclesRes] = await Promise.all([
         fetch(`${API}/orders`),
         fetch(`${API}/clients`),
         fetch(`${API}/warehouses`),
         fetch(`${API}/drivers`),
-        fetch(`${API}/vehicles`)
+        fetch(`${API}/vehicles`),
       ]);
 
-      // Si algún fetch falla, no romper todo
-      const orders = ordersRes.ok ? await ordersRes.json() : [];
-      const clients = clientsRes.ok ? await clientsRes.json() : [];
-      const warehouses = warehousesRes.ok ? await warehousesRes.json() : [];
-      const drivers = driversRes.ok ? await driversRes.json() : [];
-      const vehicles = vehiclesRes.ok ? await vehiclesRes.json() : [];
+      // Manejo seguro de respuestas
+      const safeJson = async (res) => (res.ok ? await res.json() : []);
+      const [orders, clients, warehouses, drivers, vehicles] = await Promise.all([
+        safeJson(ordersRes),
+        safeJson(clientsRes),
+        safeJson(warehousesRes),
+        safeJson(driversRes),
+        safeJson(vehiclesRes),
+      ]);
 
       setCounts({
         orders: Array.isArray(orders) ? orders.length : 0,
         clients: Array.isArray(clients) ? clients.length : 0,
         warehouses: Array.isArray(warehouses) ? warehouses.length : 0,
         drivers: Array.isArray(drivers) ? drivers.length : 0,
-        vehicles: Array.isArray(vehicles) ? vehicles.length : 0
+        vehicles: Array.isArray(vehicles) ? vehicles.length : 0,
       });
+
+      setLastUpdate(new Date().toLocaleString());
     } catch (err) {
-      console.error('fetchCounts error', err);
+      console.error('Error trayendo datos del dashboard:', err);
     } finally {
       setLoading(false);
     }
   }
 
   useEffect(() => {
-    // fetch inicial
     fetchCounts();
 
-    // polling cada 8s (ajustable)
-    pollingRef.current = setInterval(fetchCounts, 8000);
+    // Actualiza cada 10 segundos
+    pollingRef.current = setInterval(fetchCounts, 10000);
 
-    // escuchar eventos locales para refresh inmediato
-    function onDataChange(e) {
-      // puedes inspeccionar e.detail.resource si quieres refrescar solo uno
+    // Escucha los cambios locales (por ejemplo, cuando se agrega un cliente o envío)
+    function onDataChange() {
       fetchCounts();
     }
     window.addEventListener('logistic:data-changed', onDataChange);
@@ -68,6 +72,14 @@ export default function Dashboard() {
     };
   }, []);
 
+  const data = [
+    { label: 'Envíos Activos', value: counts.orders, sub: 'Total envíos' },
+    { label: 'Clientes', value: counts.clients, sub: 'Total clientes' },
+    { label: 'Almacenes', value: counts.warehouses, sub: 'Total almacenes' },
+    { label: 'Conductores', value: counts.drivers, sub: 'Total conductores' },
+    { label: 'Vehículos', value: counts.vehicles, sub: 'Total vehículos' },
+  ];
+
   return (
     <div className="dashboard-page p-4">
       <h1 className="dashboard-title">Dashboard General</h1>
@@ -77,42 +89,24 @@ export default function Dashboard() {
         <p>Visualiza el estado general del sistema logístico.</p>
 
         <div className="summary-grid">
-          <div className="stat-card">
-            <h4>Envíos Activos</h4>
-            <div className="stat-value">{loading ? '...' : counts.orders}</div>
-            <div className="stat-sub">Total envíos</div>
-          </div>
-
-          <div className="stat-card">
-            <h4>Clientes</h4>
-            <div className="stat-value">{loading ? '...' : counts.clients}</div>
-            <div className="stat-sub">Total clientes</div>
-          </div>
-
-          <div className="stat-card">
-            <h4>Almacenes</h4>
-            <div className="stat-value">{loading ? '...' : counts.warehouses}</div>
-            <div className="stat-sub">Total almacenes</div>
-          </div>
-
-          <div className="stat-card">
-            <h4>Conductores</h4>
-            <div className="stat-value">{loading ? '...' : counts.drivers}</div>
-            <div className="stat-sub">Total conductores</div>
-          </div>
-
-          <div className="stat-card">
-            <h4>Vehículos</h4>
-            <div className="stat-value">{loading ? '...' : counts.vehicles}</div>
-            <div className="stat-sub">Total vehículos</div>
-          </div>
+          {data.map((item) => (
+            <div key={item.label} className="stat-card">
+              <h4>{item.label}</h4>
+              <div className="stat-value">{loading ? '...' : item.value}</div>
+              <div className="stat-sub">{item.sub}</div>
+            </div>
+          ))}
         </div>
       </div>
 
       <div className="card activity-card">
         <h3>Actividad reciente</h3>
-        <p className="muted">Última actualización: {new Date().toLocaleString()}</p>
-        <div className="activity-hint">Se actualiza automáticamente y al crear nuevos registros.</div>
+        <p className="muted">
+          Última actualización: {lastUpdate || 'Cargando...'}
+        </p>
+        <div className="activity-hint">
+          Se actualiza automáticamente y al crear nuevos registros.
+        </div>
       </div>
     </div>
   );
