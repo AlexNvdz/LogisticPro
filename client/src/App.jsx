@@ -41,6 +41,7 @@ import Layout from './layout/layout'
 import Dashboard from './pages/dashboard'
 import Envios from './pages/envios'
 import Rutas from './pages/rutas'
+import Conductores from './pages/conductores'
 import Almacenes from './pages/almacenes'
 import Usuarios from './pages/usuarios'
 import Vehiculos from './pages/vehiculos';
@@ -55,6 +56,7 @@ function App() {
           <Route path="/envios" element={<Envios />} />
           <Route path="/rutas" element={<Rutas />} />
           <Route path="/almacenes" element={<Almacenes />} />
+          <Route path="/conductores" element={<Conductores />} />
           <Route path="/usuarios" element={<Usuarios />} />
           <Route path="*" element={<Navigate to="/" replace />} />
           <Route path="/vehiculos" element={<Vehiculos />} />

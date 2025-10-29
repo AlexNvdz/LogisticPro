@@ -1,10 +1,11 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import "./layout.css";
 
 export default function Layout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const handleResize = () => {
@@ -13,10 +14,10 @@ export default function Layout({ children }) {
         setIsSidebarOpen(false);
       }
     };
-    
+
     handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   const navigationItems = [
@@ -24,41 +25,49 @@ export default function Layout({ children }) {
     { path: "/envios", icon: "📦", text: "Envíos" },
     { path: "/rutas", icon: "🗺️", text: "Rutas" },
     { path: "/almacenes", icon: "🏭", text: "Almacenes" },
+    { path: "/conductores", icon: "🚚", text: "Conductores" },
+    { path: "/vehiculos", icon: "🚗", text: "Vehículos" },
     { path: "/usuarios", icon: "👥", text: "Usuarios" }
   ];
 
+  // 📌 Cambia el título dinámicamente según la ruta
+  const getPageTitle = () => {
+    const current = navigationItems.find(item => item.path === location.pathname);
+    return current ? current.text : "Panel de Control";
+  };
+
   return (
     <div className="app-container">
-      {/* Overlay for mobile */}
+      {/* Overlay para móvil */}
       {isMobile && isSidebarOpen && (
-        <div 
+        <div
           className="sidebar-overlay"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <aside className={`sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
+      <aside className={`sidebar ${isSidebarOpen ? "open" : "closed"}`}>
         <div className="sidebar-header">
           <div className="logo-container">
             <span className="logo-icon">🚚</span>
             {isSidebarOpen && <h1 className="logo-text">LogisticPro</h1>}
           </div>
-          <button 
+          <button
             className="sidebar-toggle"
             onClick={() => setIsSidebarOpen(!isSidebarOpen)}
           >
-            {isSidebarOpen ? '◀' : '▶'}
+            {isSidebarOpen ? "◀" : "▶"}
           </button>
         </div>
 
         <nav className="nav-menu">
           {navigationItems.map(({ path, icon, text }) => (
-            <NavLink 
+            <NavLink
               key={path}
               to={path}
-              className={({ isActive }) => 
-                `nav-item ${isActive ? 'active' : ''}`
+              className={({ isActive }) =>
+                `nav-item ${isActive ? "active" : ""}`
               }
             >
               <span className="nav-icon">{icon}</span>
@@ -73,7 +82,7 @@ export default function Layout({ children }) {
         <header className="top-header">
           <div className="header-left">
             {isMobile && (
-              <button 
+              <button
                 className="mobile-menu-btn"
                 onClick={() => setIsSidebarOpen(true)}
               >
@@ -81,7 +90,7 @@ export default function Layout({ children }) {
               </button>
             )}
             <div className="page-title">
-              <h2>Panel de Control</h2>
+              <h2>{getPageTitle()}</h2>
             </div>
           </div>
           <div className="header-right">
@@ -89,17 +98,15 @@ export default function Layout({ children }) {
               <input type="search" placeholder="Buscar..." />
             </div>
             <div className="user-menu">
-              <img 
-                src="https://ui-avatars.com/api/?name=User" 
-                alt="User" 
+              <img
+                src="https://ui-avatars.com/api/?name=User"
+                alt="User"
                 className="user-avatar"
               />
             </div>
           </div>
         </header>
-        <div className="content-wrapper">
-          {children}
-        </div>
+        <div className="content-wrapper">{children}</div>
       </main>
     </div>
   );
