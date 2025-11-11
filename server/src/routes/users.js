@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const usersCtrl = require('../controllers/usersController');
-const { authenticateToken, authorizeAdmin } = require('../middleware/authMiddlewaree');
+const { authenticateToken, authorizeAdmin } = require('../middleware/authMiddleware');
 
 // Rutas CRUD para users (solo admins)
 router.get('/', authenticateToken, authorizeAdmin, usersCtrl.getAllUsers);         // GET /users
