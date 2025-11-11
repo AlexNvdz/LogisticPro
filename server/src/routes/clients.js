@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const ctrl = require('../controllers/clientsController');
-const { authenticateToken, authorizeAdmin, authorizeUser } = require('../middlewares/auth');
+const { authenticateToken, authorizeAdmin, authorizeUser } = require('../middleware/authMiddleware');
 
 // Rutas CRUD base: la ruta base aquí es '/clients' desde server.js
 router.get('/', authenticateToken, authorizeUser, ctrl.getAllClients);       // GET /clients

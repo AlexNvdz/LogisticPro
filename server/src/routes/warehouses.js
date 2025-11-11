@@ -2,7 +2,7 @@
 const express = require('express');
 const pool = require('../db/connection');
 const router = express.Router();
-const { authenticateToken, authorizeAdmin } = require('../middlewares/auth');
+const { authenticateToken, authorizeAdmin } = require('../middleware/authMiddleware');
 
 // GET todos los almacenes (solo admins)
 router.get('/', authenticateToken, authorizeAdmin, async (req, res) => {

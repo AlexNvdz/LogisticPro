@@ -2,7 +2,7 @@
 const express = require('express');
 const { getAllRoutes, createRoute } = require('../controllers/routeController');
 const { getAddressFromCoordinates } = require('../controllers/geocodeController');
-const { authenticateToken, authorizeAdmin } = require('../middlewares/auth');
+const { authenticateToken, authorizeAdmin } = require('../middleware/authMiddleware');
 
 const router = express.Router();
 

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db/connection');
-const { authenticateToken, authorizeAdmin } = require('../middlewares/auth');
+const { authenticateToken, authorizeAdmin } = require('../middleware/authMiddleware');
 
 // Obtener todos los conductores (solo admins)
 router.get('/', authenticateToken, authorizeAdmin, async (req, res) => {

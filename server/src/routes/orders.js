@@ -2,7 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const ctrl = require('../controllers/ordersController');
-const { authenticateToken, authorizeUser, authorizeAdmin } = require('../middlewares/auth');
+const { authenticateToken, authorizeUser, authorizeAdmin } = require('../middleware/authMiddleware);');
 
 // Usuarios registrados pueden ver órdenes
 router.get('/', authenticateToken, authorizeUser, ctrl.getAllOrders);
