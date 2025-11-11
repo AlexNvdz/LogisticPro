@@ -1,0 +1,21 @@
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+server/.env
+
+# Database dumps
+*.sql
+dump*.*
+backup*.*
+dump_custom.dump
+
+# Build outputs
+dist/
+build/
+
+# IDE/editor
+.vscode/
