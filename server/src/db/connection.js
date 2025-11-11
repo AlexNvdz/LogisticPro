@@ -1,25 +1,24 @@
-// server/src/db/connection.js
-const { Pool } = require('pg');
-require('dotenv').config();
+import pg from 'pg';
+import dotenv from 'dotenv';
 
-const connectionString = process.env.DATABASE_URL;
+dotenv.config();
 
-const pool = new Pool({
-  connectionString,
-  ssl: { rejectUnauthorized: false } // Render necesita SSL
-});
+const { Pool } = pg;
 
+// Usa DATABASE_URL si está definida (Render), o variables separadas (local)
+const pool = new Pool(
+  process.env.DATABASE_URL
+    ? {
+        connectionString: process.env.DATABASE_URL,
+        ssl: { rejectUnauthorized: false } // Render necesita SSL
+      }
+    : {
+        host: process.env.PGHOST || 'localhost',
+        user: process.env.PGUSER || 'postgres',
+        password: process.env.PGPASSWORD || '1234',
+        database: process.env.PGDATABASE || 'logisticpro',
+        port: process.env.PGPORT || 5432
+      }
+);
 
-if (process.env.NODE_ENV !== 'test') {
-  pool.connect()
-    .then(() => console.log('✅ Conectado a PostgreSQL (Render)'))
-    .catch(err => console.error('❌ Error al conectar a PostgreSQL:', err.message));
-}
-
-pool.on('error', (err) => {
-  console.error('Error inesperado en cliente idle', err);
-});
-
-module.exports = pool;
-
-
+export default pool;
