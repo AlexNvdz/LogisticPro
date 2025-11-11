@@ -46,94 +46,53 @@ import Almacenes from "./pages/almacenes";
 import Usuarios from "./pages/usuarios";
 import Vehiculos from "./pages/vehiculos";
 import PrivateRoute from "./components/PrivateRoute";
-import Login from "./pages/login"; 
+import Login from "./pages/login";
+import Register from "./pages/register";
 import "./App.css";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* 🔐 Ruta pública de login */}
+        {/* 🔓 Rutas públicas */}
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
-        {/* 🔒 Rutas privadas dentro del Layout */}
+        {/* 🔒 Rutas privadas */}
         <Route
           path="/"
           element={
             <PrivateRoute>
-              <Layout>
-                <Dashboard />
-              </Layout>
+              <Layout />
             </PrivateRoute>
           }
-        />
-
-        <Route
-          path="/envios"
-          element={
-            <PrivateRoute allowedRoles={["admin", "user"]}>
-              <Layout>
-                <Envios />
-              </Layout>
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/rutas"
-          element={
-            <PrivateRoute allowedRoles={["admin", "user"]}>
-              <Layout>
-                <Rutas />
-              </Layout>
-            </PrivateRoute>
-          }
-        />
-
-        {/* 🏢 Solo admin */}
-        <Route
-          path="/almacenes"
-          element={
-            <PrivateRoute allowedRoles={["admin"]}>
-              <Layout>
-                <Almacenes />
-              </Layout>
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/conductores"
-          element={
-            <PrivateRoute allowedRoles={["admin"]}>
-              <Layout>
-                <Conductores />
-              </Layout>
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/vehiculos"
-          element={
-            <PrivateRoute allowedRoles={["admin"]}>
-              <Layout>
-                <Vehiculos />
-              </Layout>
-            </PrivateRoute>
-          }
-        />
-
-        <Route
-          path="/usuarios"
-          element={
-            <PrivateRoute allowedRoles={["admin"]}>
-              <Layout>
-                <Usuarios />
-              </Layout>
-            </PrivateRoute>
-          }
-        />
+        >
+          <Route index element={<Dashboard />} />
+          <Route
+            path="envios"
+            element={<PrivateRoute allowedRoles={["admin", "user"]}><Envios /></PrivateRoute>}
+          />
+          <Route
+            path="rutas"
+            element={<PrivateRoute allowedRoles={["admin", "user"]}><Rutas /></PrivateRoute>}
+          />
+          <Route
+            path="almacenes"
+            element={<PrivateRoute allowedRoles={["admin"]}><Almacenes /></PrivateRoute>}
+          />
+          <Route
+            path="conductores"
+            element={<PrivateRoute allowedRoles={["admin"]}><Conductores /></PrivateRoute>}
+          />
+          <Route
+            path="vehiculos"
+            element={<PrivateRoute allowedRoles={["admin"]}><Vehiculos /></PrivateRoute>}
+          />
+          <Route
+            path="usuarios"
+            element={<PrivateRoute allowedRoles={["admin"]}><Usuarios /></PrivateRoute>}
+          />
+        </Route>
 
         {/* 🚫 Ruta no encontrada */}
         <Route path="*" element={<Navigate to="/" replace />} />

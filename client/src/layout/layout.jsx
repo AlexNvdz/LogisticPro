@@ -135,7 +135,9 @@ export default function Layout({ children }) {
         </header>
 
         {/* 🔸 Contenido dinámico */}
-        <div className="content-wrapper">{children}</div>
+        <div className="content-wrapper">
+          <Outlet />
+        </div> 
       </main>
     </div>
   );
