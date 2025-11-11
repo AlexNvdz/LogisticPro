@@ -58,9 +58,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* 🔒 Rutas privadas */}
+        {/* 🔒 Rutas privadas con Layout */}
         <Route
-          path="/"
           element={
             <PrivateRoute>
               <Layout />
@@ -68,30 +67,14 @@ function App() {
           }
         >
           <Route index element={<Dashboard />} />
-          <Route
-            path="envios"
-            element={<PrivateRoute allowedRoles={["admin", "user"]}><Envios /></PrivateRoute>}
-          />
-          <Route
-            path="rutas"
-            element={<PrivateRoute allowedRoles={["admin", "user"]}><Rutas /></PrivateRoute>}
-          />
-          <Route
-            path="almacenes"
-            element={<PrivateRoute allowedRoles={["admin"]}><Almacenes /></PrivateRoute>}
-          />
-          <Route
-            path="conductores"
-            element={<PrivateRoute allowedRoles={["admin"]}><Conductores /></PrivateRoute>}
-          />
-          <Route
-            path="vehiculos"
-            element={<PrivateRoute allowedRoles={["admin"]}><Vehiculos /></PrivateRoute>}
-          />
-          <Route
-            path="usuarios"
-            element={<PrivateRoute allowedRoles={["admin"]}><Usuarios /></PrivateRoute>}
-          />
+          <Route path="envios" element={<Envios />} />
+          <Route path="rutas" element={<Rutas />} />
+
+          {/* 🧭 Solo admin */}
+          <Route path="almacenes" element={<Almacenes />} />
+          <Route path="conductores" element={<Conductores />} />
+          <Route path="vehiculos" element={<Vehiculos />} />
+          <Route path="usuarios" element={<Usuarios />} />
         </Route>
 
         {/* 🚫 Ruta no encontrada */}
