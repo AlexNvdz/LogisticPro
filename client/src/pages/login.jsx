@@ -1,32 +1,51 @@
-import jwt from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
-import { pool } from '../db/connection.js';
+import { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-const handleLogin = async (e) => {
-  e.preventDefault();
+export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const navigate = useNavigate();
 
-  try {
-    const res = await fetch('https://logisticpro.onrender.com/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    });
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.post('https://logisticpro.onrender.com/api/login', {
+        email,
+        password,
+      });
 
-    const data = await res.json();
+      // Guarda el token JWT que el backend envía
+      localStorage.setItem('token', res.data.token);
 
-    if (res.ok) {
-      // Guarda el token y el rol en localStorage
-      localStorage.setItem('token', data.token);
-      localStorage.setItem('role', data.role);
-
-      // Redirige al dashboard
-      window.location.href = '/dashboard';
-    } else {
-      alert(data.message || 'Error en el login');
+      alert('Inicio de sesión exitoso');
+      navigate('/');
+    } catch (err) {
+      alert('Credenciales incorrectas');
+      console.error(err);
     }
-  } catch (error) {
-    console.error(error);
-    alert('Error al conectar con el servidor');
-  }
-};
-export default handleLogin;
+  };
+
+  return (
+    <div className="login-page">
+      <h2>Iniciar Sesión</h2>
+      <form onSubmit={handleLogin}>
+        <input
+          type="email"
+          placeholder="Correo"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Contraseña"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <button type="submit">Entrar</button>
+      </form>
+    </div>
+  );
+}
