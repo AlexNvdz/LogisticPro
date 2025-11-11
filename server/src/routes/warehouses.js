@@ -2,9 +2,10 @@
 const express = require('express');
 const pool = require('../db/connection');
 const router = express.Router();
+const { authenticateToken, authorizeAdmin } = require('../middlewares/auth');
 
-// GET todos los almacenes
-router.get('/', async (req, res) => {
+// GET todos los almacenes (solo admins)
+router.get('/', authenticateToken, authorizeAdmin, async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM warehouses ORDER BY id DESC');
     res.json(result.rows);
@@ -14,8 +15,8 @@ router.get('/', async (req, res) => {
   }
 });
 
-// POST crear un almacén
-router.post('/', async (req, res) => {
+// POST crear un almacén (solo admins)
+router.post('/', authenticateToken, authorizeAdmin, async (req, res) => {
   const { name, location, capacity, manager, status } = req.body;
   try {
     const result = await pool.query(
@@ -30,8 +31,8 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PUT editar un almacén
-router.put('/:id', async (req, res) => {
+// PUT editar un almacén (solo admins)
+router.put('/:id', authenticateToken, authorizeAdmin, async (req, res) => {
   const { id } = req.params;
   const { name, location, capacity, manager, status } = req.body;
   try {
@@ -52,8 +53,8 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// DELETE eliminar un almacén
-router.delete('/:id', async (req, res) => {
+// DELETE eliminar un almacén (solo admins)
+router.delete('/:id', authenticateToken, authorizeAdmin, async (req, res) => {
   const { id } = req.params;
   try {
     const result = await pool.query(

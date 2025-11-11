@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const pool = require('../db/connection');
+const { authenticateToken, authorizeAdmin } = require('../middlewares/auth');
 
-// Obtener todos los conductores
-router.get('/', async (req, res) => {
+// Obtener todos los conductores (solo admins)
+router.get('/', authenticateToken, authorizeAdmin, async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM drivers ORDER BY id ASC');
     res.json(result.rows);
@@ -12,8 +13,8 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Crear un nuevo conductor
-router.post('/', async (req, res) => {
+// Crear un nuevo conductor (solo admins)
+router.post('/', authenticateToken, authorizeAdmin, async (req, res) => {
   try {
     const { name, license_number, phone, status } = req.body;
     const result = await pool.query(

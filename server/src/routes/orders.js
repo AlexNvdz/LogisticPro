@@ -2,11 +2,15 @@
 const express = require('express');
 const router = express.Router();
 const ctrl = require('../controllers/ordersController');
+const { authenticateToken, authorizeUser, authorizeAdmin } = require('../middlewares/auth');
 
-router.get('/', ctrl.getAllOrders);        // GET /orders
-router.get('/:id', ctrl.getOrderById);     // GET /orders/:id
-router.post('/', ctrl.createOrder);        // POST /orders
-router.put('/:id', ctrl.updateOrder);      // PUT /orders/:id
-router.delete('/:id', ctrl.deleteOrder);   // DELETE /orders/:id
+// Usuarios registrados pueden ver órdenes
+router.get('/', authenticateToken, authorizeUser, ctrl.getAllOrders);
+router.get('/:id', authenticateToken, authorizeUser, ctrl.getOrderById);
+
+// Solo admins pueden crear, editar o eliminar órdenes
+router.post('/', authenticateToken, authorizeAdmin, ctrl.createOrder);
+router.put('/:id', authenticateToken, authorizeAdmin, ctrl.updateOrder);
+router.delete('/:id', authenticateToken, authorizeAdmin, ctrl.deleteOrder);
 
 module.exports = router;

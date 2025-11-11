@@ -36,34 +36,110 @@ function App() {
 export default App
 */
 
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import Layout from './layout/layout'
-import Dashboard from './pages/dashboard'
-import Envios from './pages/envios'
-import Rutas from './pages/rutas'
-import Conductores from './pages/conductores'
-import Almacenes from './pages/almacenes'
-import Usuarios from './pages/usuarios'
-import Vehiculos from './pages/vehiculos';
-import './App.css'
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Layout from "./layout/layout";
+import Dashboard from "./pages/dashboard";
+import Envios from "./pages/envios";
+import Rutas from "./pages/rutas";
+import Conductores from "./pages/conductores";
+import Almacenes from "./pages/almacenes";
+import Usuarios from "./pages/usuarios";
+import Vehiculos from "./pages/vehiculos";
+import PrivateRoute from "./components/PrivateRoute";
+import Login from "./pages/login"; 
+import "./App.css";
 
 function App() {
   return (
     <BrowserRouter>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/envios" element={<Envios />} />
-          <Route path="/rutas" element={<Rutas />} />
-          <Route path="/almacenes" element={<Almacenes />} />
-          <Route path="/conductores" element={<Conductores />} />
-          <Route path="/usuarios" element={<Usuarios />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-          <Route path="/vehiculos" element={<Vehiculos />} />
-        </Routes>
-      </Layout>
+      <Routes>
+        {/* 🔐 Ruta pública de login */}
+        <Route path="/login" element={<Login />} />
+
+        {/* 🔒 Rutas privadas dentro del Layout */}
+        <Route
+          path="/"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <Dashboard />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/envios"
+          element={
+            <PrivateRoute allowedRoles={["admin", "user"]}>
+              <Layout>
+                <Envios />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/rutas"
+          element={
+            <PrivateRoute allowedRoles={["admin", "user"]}>
+              <Layout>
+                <Rutas />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+
+        {/* 🏢 Solo admin */}
+        <Route
+          path="/almacenes"
+          element={
+            <PrivateRoute allowedRoles={["admin"]}>
+              <Layout>
+                <Almacenes />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/conductores"
+          element={
+            <PrivateRoute allowedRoles={["admin"]}>
+              <Layout>
+                <Conductores />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/vehiculos"
+          element={
+            <PrivateRoute allowedRoles={["admin"]}>
+              <Layout>
+                <Vehiculos />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/usuarios"
+          element={
+            <PrivateRoute allowedRoles={["admin"]}>
+              <Layout>
+                <Usuarios />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+
+        {/* 🚫 Ruta no encontrada */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;
