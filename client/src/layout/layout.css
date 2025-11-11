@@ -147,6 +147,53 @@
   padding: 2rem;
 }
 
+/* 🔹 Logout dentro del sidebar */
+.logout-section {
+  margin-top: auto;
+  padding: 1rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.logout-btn {
+  width: 100%;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--transition-speed);
+}
+
+.logout-btn:hover {
+  background-color: #dc2626;
+}
+
+/* 🔹 Logout del header y rol */
+.logout-btn-header {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 0.4rem 0.9rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--transition-speed);
+}
+
+.logout-btn-header:hover {
+  background-color: #1e40af;
+}
+
+.role-label {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  background-color: var(--background-color);
+  padding: 0.3rem 0.6rem;
+  border-radius: 0.4rem;
+}
+
 /* Mobile Styles */
 @media (max-width: 768px) {
   .sidebar {
@@ -183,5 +230,10 @@
 @media (max-width: 480px) {
   .search-bar {
     display: none;
+  }
+
+  .logout-btn-header {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.7rem;
   }
 }

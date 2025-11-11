@@ -8,23 +8,20 @@ export default function Layout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // 🔐 Obtener rol del usuario desde localStorage
+  // 🔐 Rol del usuario
   const role = localStorage.getItem("role") || "user";
 
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
-      if (window.innerWidth < 768) {
-        setIsSidebarOpen(false);
-      }
+      if (window.innerWidth < 768) setIsSidebarOpen(false);
     };
-
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // 🔹 Navegación según el rol
+  // 🔹 Menú de navegación
   const navigationItems = [
     { path: "/", icon: "📊", text: "Dashboard" },
     { path: "/envios", icon: "📦", text: "Envíos" },
@@ -39,7 +36,7 @@ export default function Layout({ children }) {
       : []),
   ];
 
-  // 📌 Cambia el título dinámicamente según la ruta
+  // 📌 Título de página actual
   const getPageTitle = () => {
     const current = navigationItems.find(
       (item) => item.path === location.pathname
@@ -56,7 +53,7 @@ export default function Layout({ children }) {
 
   return (
     <div className="app-container">
-      {/* Overlay para móvil */}
+      {/* Fondo para móvil cuando el sidebar está abierto */}
       {isMobile && isSidebarOpen && (
         <div
           className="sidebar-overlay"
@@ -64,7 +61,7 @@ export default function Layout({ children }) {
         />
       )}
 
-      {/* Sidebar */}
+      {/* 🔹 Sidebar */}
       <aside className={`sidebar ${isSidebarOpen ? "open" : "closed"}`}>
         <div className="sidebar-header">
           <div className="logo-container">
@@ -102,8 +99,9 @@ export default function Layout({ children }) {
         </div>
       </aside>
 
-      {/* Main Content */}
+      {/* 🔹 Contenido principal */}
       <main className="main-content">
+        {/* 🔸 Header superior */}
         <header className="top-header">
           <div className="header-left">
             {isMobile && (
@@ -118,21 +116,25 @@ export default function Layout({ children }) {
               <h2>{getPageTitle()}</h2>
             </div>
           </div>
+
           <div className="header-right">
-            <div className="search-bar">
-              <input type="search" placeholder="Buscar..." />
-            </div>
-            <div className="user-menu">
-              <img
-                src={`https://ui-avatars.com/api/?name=${
-                  role === "admin" ? "Admin" : "User"
-                }`}
-                alt="User"
-                className="user-avatar"
-              />
-            </div>
+            <span className="role-label">
+              {role === "admin" ? "Administrador" : "Usuario"}
+            </span>
+            <button onClick={handleLogout} className="logout-btn-header">
+              Cerrar sesión
+            </button>
+            <img
+              src={`https://ui-avatars.com/api/?name=${
+                role === "admin" ? "Admin" : "User"
+              }&background=1a5d94&color=fff`}
+              alt="User Avatar"
+              className="user-avatar"
+            />
           </div>
         </header>
+
+        {/* 🔸 Contenido dinámico */}
         <div className="content-wrapper">{children}</div>
       </main>
     </div>
