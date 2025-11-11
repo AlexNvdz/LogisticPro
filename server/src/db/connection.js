@@ -1,18 +1,18 @@
-import pg from 'pg';
+import pkg from 'pg';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
-const { Pool } = pg;
+const { Pool } = pkg;
 
-const isRender = !!process.env.DATABASE_URL; // Detecta si estás en Render
+const isRender = !!process.env.DATABASE_URL;
 
 const pool = new Pool(
   isRender
     ? {
         connectionString: process.env.DATABASE_URL,
         ssl: {
-          require: true, // 🔹 Render exige SSL
+          require: true,
           rejectUnauthorized: false
         }
       }
@@ -29,4 +29,4 @@ pool.connect()
   .then(() => console.log("✅ Conectado correctamente a la base de datos"))
   .catch(err => console.error("❌ Error al conectar a la base de datos:", err.message));
 
-export default pool;
+export { pool };

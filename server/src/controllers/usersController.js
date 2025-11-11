@@ -1,5 +1,5 @@
 // server/src/controllers/usersController.js
-const pool = require('../db/connection');
+const {pool} = require('../db/connection');
 
 // Helpers de validación simples
 function isValidEmail(email) {

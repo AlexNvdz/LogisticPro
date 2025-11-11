@@ -1,6 +1,6 @@
 // server/src/controllers/routeController.js
 const fetch = require('node-fetch');
-const pool = require('../db/connection');
+const {pool} = require('../db/connection');
 
 async function getAllRoutes(req, res) {
   try {

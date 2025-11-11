@@ -1,5 +1,5 @@
 // server/src/controllers/clientsController.js
-const pool = require('../db/connection'); // debe apuntar a ../db/connection.js
+const {pool} = require('../db/connection'); // debe apuntar a ../db/connection.js
 
 const isNonEmpty = v => typeof v === 'string' && v.trim().length > 0;
 

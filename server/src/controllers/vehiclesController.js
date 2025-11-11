@@ -1,5 +1,5 @@
 // server/src/controllers/vehiclesController.js
-const pool = require('../db/connection');
+const {pool} = require('../db/connection');
 const isNonEmpty = v => typeof v === 'string' && v.trim().length > 0;
 
 module.exports = {
