@@ -1,51 +1,67 @@
-import { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import "./login.css"; // 👈 Asegúrate de tener el CSS en src/pages/login.css
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('https://logisticpro.onrender.com/api/login', {
+      const res = await axios.post("https://logisticpro.onrender.com/auth/login", {
         email,
         password,
       });
 
-      // Guarda el token JWT que el backend envía
-      localStorage.setItem('token', res.data.token);
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("role", res.data.role);
 
-      alert('Inicio de sesión exitoso');
-      navigate('/');
+      navigate("/");
     } catch (err) {
-      alert('Credenciales incorrectas');
-      console.error(err);
+      setError("Correo o contraseña incorrectos");
     }
   };
 
   return (
-    <div className="login-page">
-      <h2>Iniciar Sesión</h2>
-      <form onSubmit={handleLogin}>
-        <input
-          type="email"
-          placeholder="Correo"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-        />
-        <button type="submit">Entrar</button>
-      </form>
+    <div className="login-container">
+      <div className="login-card">
+        <div className="login-header">
+          <h1>🚚 LogisticPro</h1>
+          <p>Inicia sesión para continuar</p>
+        </div>
+        <form onSubmit={handleLogin} className="login-form">
+          <input
+            type="email"
+            placeholder="Correo electrónico"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+          />
+          <input
+            type="password"
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+          />
+          {error && <p className="error">{error}</p>}
+          <button type="submit">Iniciar sesión</button>
+        </form>
+        <div className="login-footer">
+          <p>¿No tienes una cuenta?</p>
+          <button
+            className="register-btn"
+            type="button"
+            onClick={() => navigate("/register")}
+          >
+            Registrarse
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
