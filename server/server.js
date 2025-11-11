@@ -1,10 +1,22 @@
 // server/server.js
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 const pool = require('./src/db/connection');
 
 const app = express();
 app.use(express.json());
+
+app.use(
+  cors({
+    origin: [
+      "https://logistic-pro.vercel.app", // tu frontend en producción
+      "http://localhost:5173" // tu entorno local de desarrollo
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true
+  })
+);
 
 const usersRoutes = require('./src/routes/users');
 const clientsRoutes = require('./src/routes/clients');
