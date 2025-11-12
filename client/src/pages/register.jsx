@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "./login.css"; // Usa el mismo estilo del login
+import "./styles/login.css"; // Usa el mismo estilo del login
 
 export default function Register() {
   const [name, setName] = useState("");
