@@ -48,6 +48,7 @@ import Vehiculos from "./pages/vehiculos";
 import PrivateRoute from "./components/PrivateRoute";
 import Login from "./pages/login";
 import Register from "./pages/register";
+import AdminRoute from "./components/AdminRoute"; 
 import "./App.css";
 
 function App() {
@@ -58,7 +59,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* 🔒 Rutas privadas anidadas */}
+        {/* 🔒 Rutas privadas anidadas (para usuarios logueados) */}
         <Route
           element={
             <PrivateRoute>
@@ -66,13 +67,24 @@ function App() {
             </PrivateRoute>
           }
         >
+          {/* Rutas para todos los usuarios logueados */}
           <Route index element={<Dashboard />} />
           <Route path="envios" element={<Envios />} />
           <Route path="rutas" element={<Rutas />} />
           <Route path="almacenes" element={<Almacenes />} />
           <Route path="conductores" element={<Conductores />} />
           <Route path="vehiculos" element={<Vehiculos />} />
-          <Route path="usuarios" element={<Usuarios />} />
+
+          {/* --- Protege la ruta 'usuarios' --- */}
+          <Route
+            path="usuarios"
+            element={
+              <AdminRoute>
+                <Usuarios />
+              </AdminRoute>
+            }
+          />
+
         </Route>
 
         {/* 🚫 Ruta no encontrada */}

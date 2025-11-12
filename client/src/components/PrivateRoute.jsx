@@ -1,16 +1,22 @@
-import React from "react";
-import { Navigate, Outlet } from "react-router-dom";
+// src/components/PrivateRoute.jsx
 
-export default function PrivateRoute({ allowedRoles = ["admin", "user"], children }) {
+import { Navigate } from "react-router-dom";
+
+// Este componente REEMPLAZA el que tienes
+const PrivateRoute = ({ children }) => {
+  // 1. Revisa si hay un token guardado en el navegador
   const token = localStorage.getItem("token");
-  const role = localStorage.getItem("role");
 
-  // 🔐 No hay token → redirigir al login
-  if (!token) return <Navigate to="/login" replace />;
+  // 2. Si NO hay token...
+  if (!token) {
+    // 3. ...redirige al usuario a la página de login.
+    // 'replace' evita que pueda volver con el botón de "atrás".
+    return <Navigate to="/login" replace />;
+  }
 
-  // 🚫 Rol no permitido → dashboard
-  if (!allowedRoles.includes(role)) return <Navigate to="/" replace />;
+  // 4. Si SÍ hay token, simplemente muestra el contenido que debe proteger
+  // (en tu caso, el <Layout />)
+  return children;
+};
 
-  // ✅ Renderizar hijos o <Outlet />
-  return children || <Outlet />;
-}
+export default PrivateRoute;
