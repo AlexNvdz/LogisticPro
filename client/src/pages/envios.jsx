@@ -1,7 +1,7 @@
 // client/src/pages/envios.jsx
 const API = import.meta.env.VITE_API_URL || 'https://logisticpro.onrender.com';
 
-import './styles/envios.css';
+import '../styles/envios.css';
 import React, { useEffect, useState } from 'react';
 
 export default function Envios() {

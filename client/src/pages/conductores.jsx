@@ -2,7 +2,7 @@
 const API = import.meta.env.VITE_API_URL || 'https://logisticpro.onrender.com';
 
 import React, { useEffect, useState } from "react";
-import "./styles/conductores.css";
+import "../styles/conductores.css";
 
 export default function Conductores() {
   const [drivers, setDrivers] = useState([]);

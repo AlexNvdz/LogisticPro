@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import './styles/dashboard.css';
+import '../styles/dashboard.css';
 
 const API = import.meta.env.VITE_API_URL || 'https://logisticpro.onrender.com';
 
