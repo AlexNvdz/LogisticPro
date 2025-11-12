@@ -58,17 +58,12 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-     {/* Si no hay token, redirige al login */}
+        {/* 🔒 Rutas privadas anidadas */}
         <Route
-          path="/"
           element={
-            token ? (
-              <PrivateRoute>
-                <Layout />
-              </PrivateRoute>
-            ) : (
-              <Navigate to="/login" replace />
-            )
+            <PrivateRoute>
+              <Layout />
+            </PrivateRoute>
           }
         >
           <Route index element={<Dashboard />} />
