@@ -10,21 +10,31 @@ export default function Login() {
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await axios.post("https://logisticpro.onrender.com/auth/login", {
-        email,
-        password,
-      });
+  e.preventDefault();
+  try {
+    const res = await axios.post("https://logisticpro.onrender.com/auth/login", {
+      email,
+      password,
+    });
 
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("role", res.data.role);
+    console.log("🟩 Login response:", res.data);
 
-      navigate("/");
-    } catch (err) {
-      setError("Correo o contraseña incorrectos");
-    }
-  };
+    // ✅ Asegúrate de extraer correctamente el rol según la estructura del backend
+    const token = res.data.token;
+    const role = res.data.role || res.data.user?.role || "user";
+
+    localStorage.setItem("token", token);
+    localStorage.setItem("role", role);
+
+    console.log("✅ Token y rol guardados:", token, role);
+
+    navigate("/");
+  } catch (err) {
+    console.error("❌ Error al iniciar sesión:", err);
+    setError("Correo o contraseña incorrectos");
+  }
+};
+
 
   return (
     <div className="login-container">

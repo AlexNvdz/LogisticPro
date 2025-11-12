@@ -27,14 +27,10 @@ export default function Layout({ children }) {
     { path: "/", icon: "📊", text: "Dashboard" },
     { path: "/envios", icon: "📦", text: "Envíos" },
     { path: "/rutas", icon: "🗺️", text: "Rutas" },
-    ...(role === "admin"
-      ? [
-          { path: "/almacenes", icon: "🏭", text: "Almacenes" },
-          { path: "/conductores", icon: "🚚", text: "Conductores" },
-          { path: "/vehiculos", icon: "🚗", text: "Vehículos" },
-          { path: "/usuarios", icon: "👥", text: "Usuarios" },
-        ]
-      : []),
+    { path: "/almacenes", icon: "🏭", text: "Almacenes" },
+    { path: "/conductores", icon: "🚚", text: "Conductores" },
+    { path: "/vehiculos", icon: "🚗", text: "Vehículos" },
+    { path: "/usuarios", icon: "👥", text: "Usuarios" },
   ];
 
   // 📌 Título de página actual
