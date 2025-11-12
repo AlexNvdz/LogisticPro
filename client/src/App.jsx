@@ -58,19 +58,22 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* 🔒 Rutas privadas con Layout */}
+     {/* Si no hay token, redirige al login */}
         <Route
+          path="/"
           element={
-            <PrivateRoute>
-              <Layout />
-            </PrivateRoute>
+            token ? (
+              <PrivateRoute>
+                <Layout />
+              </PrivateRoute>
+            ) : (
+              <Navigate to="/login" replace />
+            )
           }
         >
           <Route index element={<Dashboard />} />
           <Route path="envios" element={<Envios />} />
           <Route path="rutas" element={<Rutas />} />
-
-          {/* 🧭 Solo admin */}
           <Route path="almacenes" element={<Almacenes />} />
           <Route path="conductores" element={<Conductores />} />
           <Route path="vehiculos" element={<Vehiculos />} />
