@@ -21,12 +21,12 @@ export default function Login() {
 
     // ✅ Asegúrate de extraer correctamente el rol según la estructura del backend
     const token = res.data.token;
-    const role = res.data.role || res.data.user?.role || "user";
+    // Ya no guardamos el 'role'
 
     localStorage.setItem("token", token);
-    localStorage.setItem("role", role);
+    // Ya no guardamos el 'role'
 
-    console.log("✅ Token y rol guardados:", token, role);
+    console.log("✅ Token guardado:", token); // 👈 ASÍ QUEDA
 
     navigate("/");
   } catch (err) {

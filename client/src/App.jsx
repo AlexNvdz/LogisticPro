@@ -48,7 +48,6 @@ import Vehiculos from "./pages/vehiculos";
 import PrivateRoute from "./components/PrivateRoute";
 import Login from "./pages/login";
 import Register from "./pages/register";
-import AdminRoute from "./components/AdminRoute"; 
 import "./App.css";
 
 function App() {
@@ -75,15 +74,9 @@ function App() {
           <Route path="conductores" element={<Conductores />} />
           <Route path="vehiculos" element={<Vehiculos />} />
 
-          {/* --- Protege la ruta 'usuarios' --- */}
-          <Route
-            path="usuarios"
-            element={
-              <AdminRoute>
-                <Usuarios />
-              </AdminRoute>
-            }
-          />
+          {/* --- CAMBIO ---
+              La ruta 'usuarios' ahora es una ruta privada normal */}
+          <Route path="usuarios" element={<Usuarios />} />
 
         </Route>
 

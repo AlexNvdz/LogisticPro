@@ -1,7 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
 import '../styles/dashboard.css';
 
-const API = import.meta.env.VITE_API_URL || 'https://logisticpro.onrender.com';
+// 1. Importamos tu nuevo cliente 'apiClient'
+import apiClient from '../lib/api'; // (Asegúrate que la ruta sea correcta)
+
+// 2. Ya no necesitamos la variable 'API', apiClient la gestiona
+// const API = import.meta.env.VITE_API_URL || 'https://logisticpro.onrender.com';
 
 export default function Dashboard() {
   const [counts, setCounts] = useState({
@@ -19,36 +23,36 @@ export default function Dashboard() {
     try {
       setLoading(true);
 
-      // Llamadas paralelas a todos los recursos
+      // 3. Usamos 'apiClient.get' en lugar de 'fetch'.
+      // El token se añade automáticamente gracias al interceptor.
       const [ordersRes, clientsRes, warehousesRes, driversRes, vehiclesRes] = await Promise.all([
-        fetch(`${API}/orders`),
-        fetch(`${API}/clients`),
-        fetch(`${API}/warehouses`),
-        fetch(`${API}/drivers`),
-        fetch(`${API}/vehicles`),
+        apiClient.get('/orders'),
+        apiClient.get('/clients'),
+        apiClient.get('/warehouses'),
+        apiClient.get('/drivers'),
+        apiClient.get('/vehicles'),
       ]);
 
-      // Manejo seguro de respuestas
-      const safeJson = async (res) => (res.ok ? await res.json() : []);
-      const [orders, clients, warehouses, drivers, vehicles] = await Promise.all([
-        safeJson(ordersRes),
-        safeJson(clientsRes),
-        safeJson(warehousesRes),
-        safeJson(driversRes),
-        safeJson(vehiclesRes),
-      ]);
-
+      // 4. axios pone la respuesta en la propiedad .data
+      // Ya no necesitamos la función 'safeJson'
       setCounts({
-        orders: Array.isArray(orders) ? orders.length : 0,
-        clients: Array.isArray(clients) ? clients.length : 0,
-        warehouses: Array.isArray(warehouses) ? warehouses.length : 0,
-        drivers: Array.isArray(drivers) ? drivers.length : 0,
-        vehicles: Array.isArray(vehicles) ? vehicles.length : 0,
+        orders: Array.isArray(ordersRes.data) ? ordersRes.data.length : 0,
+        clients: Array.isArray(clientsRes.data) ? clientsRes.data.length : 0,
+        warehouses: Array.isArray(warehousesRes.data) ? warehousesRes.data.length : 0,
+        drivers: Array.isArray(driversRes.data) ? driversRes.data.length : 0,
+        vehicles: Array.isArray(vehiclesRes.data) ? vehiclesRes.data.length : 0,
       });
 
       setLastUpdate(new Date().toLocaleString());
     } catch (err) {
       console.error('Error trayendo datos del dashboard:', err);
+      // Opcional: si el error es 401 (token expirado), podríamos redirigir al login
+      if (err.response && err.response.status === 401) {
+        console.error("Token no válido o expirado. Redirigiendo a login...");
+        // Aquí podrías limpiar localStorage y redirigir
+        // localStorage.clear();
+        // window.location.href = '/login'; 
+      }
     } finally {
       setLoading(false);
     }
