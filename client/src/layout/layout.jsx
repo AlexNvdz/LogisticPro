@@ -34,7 +34,6 @@ export default function Layout({ children }) {
     { path: "/almacenes", icon: "🏭", text: "Almacenes" },
     { path: "/conductores", icon: "🚚", text: "Conductores" },
     { path: "/vehiculos", icon: "🚗", text: "Vehículos" },
-    { path: "/usuarios", icon: "👤", text: "Usuarios" },
   ];
 
   const navigationItems = isadmin ? [...commonItems, ...adminItems] : commonItems;
