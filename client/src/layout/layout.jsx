@@ -9,7 +9,7 @@ export default function Layout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // --- CAMBIO 1 ---
+  // --- CAMBIO 1 --- //
   const isadmin = localStorage.getItem("isadmin") === "true";
 
   useEffect(() => {
