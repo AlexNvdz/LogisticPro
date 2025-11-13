@@ -43,7 +43,7 @@ import Envios from "./pages/envios";
 import Rutas from "./pages/rutas";
 import Conductores from "./pages/conductores";
 import Almacenes from "./pages/almacenes";
-import Usuarios from "./pages/usuarios";
+import Clientes from "./pages/clientes";
 import Vehiculos from "./pages/vehiculos";
 import PrivateRoute from "./components/PrivateRoute";
 import Login from "./pages/login";
@@ -73,6 +73,7 @@ function App() {
           <Route path="almacenes" element={<Almacenes />} />
           <Route path="conductores" element={<Conductores />} />
           <Route path="vehiculos" element={<Vehiculos />} />
+          <Route path="clientes" element={<Clientes />} />
 
           {/* --- CAMBIO ---
               La ruta 'usuarios' ahora es una ruta privada normal */}

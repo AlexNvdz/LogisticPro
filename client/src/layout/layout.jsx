@@ -30,6 +30,7 @@ export default function Layout({ children }) {
     { path: "/almacenes", icon: "🏭", text: "Almacenes" },
     { path: "/conductores", icon: "🚚", text: "Conductores" },
     { path: "/vehiculos", icon: "🚗", text: "Vehículos" },
+    { path: "/clientes", icon: "👥", text: "Clientes" },
   ];
 
   // 📌 Título de página actual
