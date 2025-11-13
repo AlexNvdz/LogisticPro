@@ -1,5 +1,17 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 :root {
   --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  
+  /* Colors */
+  --primary-color: #2563eb;
+  --secondary-color: #1e40af;
+  --background-color: #f0f4f8;
+  --surface-color: #ffffff;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-tertiary: #94a3b8;
+  --border-color: #e2e8f0;
 }
 
 * {
@@ -12,15 +24,71 @@ html {
   font-family: var(--font-family);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  height: 100%;
+  width: 100%;
 }
 
 body {
-  line-height: 1.5;
-  color: #1e293b;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background-color: var(--background-color);
+  height: 100%;
+  width: 100%;
 }
 
 #root {
-  min-height: 100vh;
+  height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
+}
+
+/* Remove scrollbar on body when app is loaded */
+html, body {
+  overflow: hidden;
+}
+
+/* Global scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--text-secondary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-primary);
+}
+
+/* Button reset */
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+/* Link reset */
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Input reset */
+input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
+/* Image responsive */
+img {
+  max-width: 100%;
+  height: auto;
 }

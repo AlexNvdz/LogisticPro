@@ -1,17 +1,20 @@
 import { useState, useEffect } from 'react';
 import apiClient from '../lib/api';
-// (Asegúrate de tener o crear este archivo CSS, puedes copiar el de almacenes)
-import '../styles/almacenes.css'; 
+import '../styles/clientes.css';
 
 export default function Clientes() {
   const [clientes, setClientes] = useState([]);
   const [loading, setLoading] = useState(false);
-  // Campos del formulario para un Cliente
+  const [showFormCreate, setShowFormCreate] = useState(false);
+  const [showFormEdit, setShowFormEdit] = useState(false);
   const [form, setForm] = useState({ name: '', contact_email: '', contact_phone: '', address: '' });
   const [editForm, setEditForm] = useState(null);
   const [busqueda, setBusqueda] = useState('');
+  const [filtroTipo, setFiltroTipo] = useState('');
 
-  useEffect(() => { fetchClientes(); }, []);
+  useEffect(() => {
+    fetchClientes();
+  }, []);
 
   async function fetchClientes() {
     setLoading(true);
@@ -19,7 +22,7 @@ export default function Clientes() {
       const res = await apiClient.get('/clients');
       setClientes(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
-      alert('Error cargando clientes');
+      console.error('Error cargando clientes:', err);
     } finally {
       setLoading(false);
     }
@@ -32,16 +35,21 @@ export default function Clientes() {
       const nuevo = res.data;
       setClientes(prev => [nuevo, ...prev]);
       setForm({ name: '', contact_email: '', contact_phone: '', address: '' });
-      document.getElementById('form-cliente').style.display = 'none';
+      setShowFormCreate(false);
+      window.dispatchEvent(new CustomEvent('logistic:data-changed', { detail: { resource: 'clients', id: nuevo.id } }));
     } catch (err) {
-      console.error("Error creando cliente:", err);
-      // --- CAMBIO AQUÍ ---
-      if (err.response && err.response.status === 403) {
+      console.error('Error creando cliente:', err);
+      if (err.response?.status === 403) {
         alert('No tienes permiso para crear clientes. Solo los administradores pueden.');
       } else {
         alert('Error creando cliente.');
       }
     }
+  }
+
+  function abrirEditar(cliente) {
+    setEditForm({ ...cliente });
+    setShowFormEdit(true);
   }
 
   async function editarCliente(e) {
@@ -57,11 +65,10 @@ export default function Clientes() {
       const actualizado = res.data;
       setClientes(prev => prev.map(c => c.id === actualizado.id ? actualizado : c));
       setEditForm(null);
-      document.getElementById('form-editar-cliente').style.display = 'none';
+      setShowFormEdit(false);
     } catch (err) {
-      console.error("Error editando cliente:", err);
-      // --- CAMBIO AQUÍ ---
-      if (err.response && err.response.status === 403) {
+      console.error('Error editando cliente:', err);
+      if (err.response?.status === 403) {
         alert('No tienes permiso para editar clientes. Solo los administradores pueden.');
       } else {
         alert('Error editando cliente.');
@@ -70,14 +77,14 @@ export default function Clientes() {
   }
 
   async function eliminarCliente(id) {
-    if (!window.confirm('¿Eliminar este cliente?')) return;
+    if (!window.confirm('¿Estás seguro de que deseas eliminar este cliente?')) return;
     try {
       await apiClient.delete(`/clients/${id}`);
       setClientes(prev => prev.filter(c => c.id !== id));
+      window.dispatchEvent(new CustomEvent('logistic:data-changed', { detail: { resource: 'clients', action: 'delete' } }));
     } catch (err) {
-      console.error("Error eliminando cliente:", err);
-      // --- CAMBIO AQUÍ ---
-      if (err.response && err.response.status === 403) {
+      console.error('Error eliminando cliente:', err);
+      if (err.response?.status === 403) {
         alert('No tienes permiso para eliminar clientes. Solo los administradores pueden.');
       } else {
         alert('Error eliminando cliente.');
@@ -85,7 +92,7 @@ export default function Clientes() {
     }
   }
 
-  // Filtros y búsqueda (simplificado para buscar por nombre, email o dirección)
+  // Filtros y búsqueda
   const clientesFiltrados = clientes.filter(c => {
     const busquedaOk = !busqueda || 
       c.name?.toLowerCase().includes(busqueda.toLowerCase()) || 
@@ -95,90 +102,196 @@ export default function Clientes() {
   });
 
   return (
-    // Puedes cambiar 'almacenes-container' si quieres, pero no es necesario si copias el CSS
-    <div className="almacenes-container"> 
-      <div className="almacenes-header">
+    <div className="clientes-container">
+      {/* Header Section */}
+      <div className="clientes-header">
         <div className="header-left">
-          <h1>Gestión de Clientes</h1>
-          <span className="almacenes-count">{clientesFiltrados.length} clientes</span>
+          <h1 className="page-title">Gestión de Clientes</h1>
+          <p className="page-subtitle">Administra y mantén contacto con tus clientes</p>
         </div>
         <button 
           className="btn-primary"
-          onClick={() => document.getElementById('form-cliente').style.display = 'block'}
+          onClick={() => setShowFormCreate(true)}
         >
-          <span className="icon">+</span>
-          Nuevo Cliente
+          <span className="btn-icon">+</span>
+          <span className="btn-text">Nuevo Cliente</span>
         </button>
       </div>
 
-      <div className="search-filters">
+      {/* Stats Overview */}
+      <div className="stats-overview">
+        <div className="stat-item">
+          <div className="stat-number">{clientes.length}</div>
+          <div className="stat-label">Total de Clientes</div>
+        </div>
+        <div className="stat-item">
+          <div className="stat-number">{clientes.filter(c => c.contact_email).length}</div>
+          <div className="stat-label">Con Email</div>
+        </div>
+        <div className="stat-item">
+          <div className="stat-number">{clientes.filter(c => c.contact_phone).length}</div>
+          <div className="stat-label">Con Teléfono</div>
+        </div>
+        <div className="stat-item">
+          <div className="stat-number">{clientesFiltrados.length}</div>
+          <div className="stat-label">Resultados Búsqueda</div>
+        </div>
+      </div>
+
+      {/* Search and Filters */}
+      <div className="search-filters-section">
         <div className="search-box">
           <input 
             type="text" 
-            placeholder="Buscar cliente..."
+            placeholder="Buscar por nombre, email o dirección..."
             className="search-input"
             value={busqueda}
             onChange={e => setBusqueda(e.target.value)}
           />
+          <span className="search-icon">🔍</span>
         </div>
-        {/* Quitamos los filtros de ciudad y estado que no aplican a clientes */}
       </div>
 
-      {/* Formulario modal para crear cliente */}
-      <div id="form-cliente" style={{display:'none', position:'fixed', top:0, left:0, width:'100vw', height:'100vh', background:'rgba(0,0,0,0.2)', zIndex:1000}}>
-        <div style={{
-          background:'#fff', borderRadius:'0.5rem', padding:'2rem', maxWidth:'400px', margin:'5vh auto', position:'relative'
-        }}>
-          <button 
-            style={{position:'absolute', top:10, right:10, background:'none', border:'none', fontSize:'1.5rem', cursor:'pointer'}}
-            onClick={() => document.getElementById('form-cliente').style.display = 'none'}
-            title="Cerrar"
-          >×</button>
-          <form onSubmit={crearCliente} className="space-y-3">
-            <h3 className="font-medium">Nuevo cliente</h3>
-            <input className="w-full p-2 border rounded" placeholder="Nombre" value={form.name} onChange={e=>setForm({...form, name:e.target.value})} required />
-            <input className="w-full p-2 border rounded" placeholder="Email" value={form.contact_email} onChange={e=>setForm({...form, contact_email:e.target.value})} />
-            <input className="w-full p-2 border rounded" placeholder="Teléfono" value={form.contact_phone} onChange={e=>setForm({...form, contact_phone:e.target.value})} />
-            <input className="w-full p-2 border rounded" placeholder="Dirección" value={form.address} onChange={e=>setForm({...form, address:e.target.value})} />
-            <div className="text-right">
-              <button className="px-4 py-2 bg-green-600 text-white rounded">Crear cliente</button>
+      {/* Modal Create */}
+      {showFormCreate && (
+        <div className="modal-overlay" onClick={() => setShowFormCreate(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Crear Nuevo Cliente</h3>
+              <button 
+                className="modal-close"
+                onClick={() => setShowFormCreate(false)}
+              >
+                ✕
+              </button>
             </div>
-          </form>
-        </div>
-      </div>
-
-      {/* Formulario modal para editar cliente */}
-      <div id="form-editar-cliente" style={{display:'none', position:'fixed', top:0, left:0, width:'100vw', height:'100vh', background:'rgba(0,0,0,0.2)', zIndex:1000}}>
-        <div style={{
-          background:'#fff', borderRadius:'0.5rem', padding:'2rem', maxWidth:'400px', margin:'5vh auto', position:'relative'
-        }}>
-          <button 
-            style={{position:'absolute', top:10, right:10, background:'none', border:'none', fontSize:'1.5rem', cursor:'pointer'}}
-            onClick={() => { setEditForm(null); document.getElementById('form-editar-cliente').style.display = 'none'; }}
-            title="Cerrar"
-          >×</button>
-          {editForm && (
-            <form onSubmit={editarCliente} className="space-y-3">
-              <h3 className="font-medium">Editar cliente</h3>
-              <input className="w-full p-2 border rounded" placeholder="Nombre" value={editForm.name} onChange={e=>setEditForm({...editForm, name:e.target.value})} required />
-              <input className="w-full p-2 border rounded" placeholder="Email" value={editForm.contact_email} onChange={e=>setEditForm({...editForm, contact_email:e.target.value})} />
-              <input className="w-full p-2 border rounded" placeholder="Teléfono" value={editForm.contact_phone} onChange={e=>setEditForm({...editForm, contact_phone:e.target.value})} />
-              <input className="w-full p-2 border rounded" placeholder="Dirección" value={editForm.address} onChange={e=>setEditForm({...editForm, address:e.target.value})} />
-              <div className="text-right">
-                <button className="px-4 py-2 bg-blue-600 text-white rounded">Guardar cambios</button>
+            <form onSubmit={crearCliente} className="form-group">
+              <div className="form-field">
+                <label>Nombre del Cliente</label>
+                <input 
+                  type="text"
+                  placeholder="Ej: Transportes ABC"
+                  value={form.name} 
+                  onChange={e => setForm({...form, name: e.target.value})} 
+                  required 
+                />
+              </div>
+              <div className="form-field">
+                <label>Email</label>
+                <input 
+                  type="email"
+                  placeholder="contacto@empresa.com"
+                  value={form.contact_email} 
+                  onChange={e => setForm({...form, contact_email: e.target.value})} 
+                />
+              </div>
+              <div className="form-field">
+                <label>Teléfono</label>
+                <input 
+                  type="tel"
+                  placeholder="+57 300 123 4567"
+                  value={form.contact_phone} 
+                  onChange={e => setForm({...form, contact_phone: e.target.value})} 
+                />
+              </div>
+              <div className="form-field">
+                <label>Dirección</label>
+                <input 
+                  type="text"
+                  placeholder="Calle 123 #45-67"
+                  value={form.address} 
+                  onChange={e => setForm({...form, address: e.target.value})} 
+                />
+              </div>
+              <div className="form-actions">
+                <button type="button" className="btn-secondary" onClick={() => setShowFormCreate(false)}>
+                  Cancelar
+                </button>
+                <button type="submit" className="btn-success">
+                  Crear Cliente
+                </button>
               </div>
             </form>
-          )}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Tabla de clientes */}
-      <div className="card">
-        <div className="table-container">
-          {loading ? (
-            <div style={{padding:'2rem', textAlign:'center'}}>Cargando...</div>
-          ) : (
-            <table className="table">
+      {/* Modal Edit */}
+      {showFormEdit && editForm && (
+        <div className="modal-overlay" onClick={() => setShowFormEdit(false)}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Editar Cliente</h3>
+              <button 
+                className="modal-close"
+                onClick={() => setShowFormEdit(false)}
+              >
+                ✕
+              </button>
+            </div>
+            <form onSubmit={editarCliente} className="form-group">
+              <div className="form-field">
+                <label>Nombre del Cliente</label>
+                <input 
+                  type="text"
+                  value={editForm.name} 
+                  onChange={e => setEditForm({...editForm, name: e.target.value})} 
+                  required 
+                />
+              </div>
+              <div className="form-field">
+                <label>Email</label>
+                <input 
+                  type="email"
+                  value={editForm.contact_email} 
+                  onChange={e => setEditForm({...editForm, contact_email: e.target.value})} 
+                />
+              </div>
+              <div className="form-field">
+                <label>Teléfono</label>
+                <input 
+                  type="tel"
+                  value={editForm.contact_phone} 
+                  onChange={e => setEditForm({...editForm, contact_phone: e.target.value})} 
+                />
+              </div>
+              <div className="form-field">
+                <label>Dirección</label>
+                <input 
+                  type="text"
+                  value={editForm.address} 
+                  onChange={e => setEditForm({...editForm, address: e.target.value})} 
+                />
+              </div>
+              <div className="form-actions">
+                <button type="button" className="btn-secondary" onClick={() => setShowFormEdit(false)}>
+                  Cancelar
+                </button>
+                <button type="submit" className="btn-primary">
+                  Guardar Cambios
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Table Section */}
+      <div className="table-card">
+        {loading ? (
+          <div className="loading-state">
+            <div className="spinner"></div>
+            <p>Cargando clientes...</p>
+          </div>
+        ) : clientesFiltrados.length === 0 ? (
+          <div className="empty-state">
+            <span className="empty-icon">👥</span>
+            <h3>No hay clientes</h3>
+            <p>No se encontraron clientes con los filtros seleccionados</p>
+          </div>
+        ) : (
+          <div className="table-wrapper">
+            <table className="data-table">
               <thead>
                 <tr>
                   <th>ID</th>
@@ -191,18 +304,43 @@ export default function Clientes() {
               </thead>
               <tbody>
                 {clientesFiltrados.map((cliente) => (
-                  <tr key={cliente.id}>
-                    <td>{cliente.id}</td>
-                    <td>{cliente.name}</td>
-                    <td>{cliente.contact_email}</td>
-                    <td>{cliente.contact_phone}</td>
-                    <td>{cliente.address}</td>
-                    <td>
-                      <div className="actions">
-                        <button className="action-btn edit" title="Editar" onClick={() => abrirEditar(cliente)}>
+                  <tr key={cliente.id} className="table-row">
+                    <td className="cell-id">
+                      <span className="id-badge">{cliente.id}</span>
+                    </td>
+                    <td className="cell-name">
+                      <span className="client-icon">👤</span>
+                      {cliente.name}
+                    </td>
+                    <td className="cell-email">
+                      <a href={`mailto:${cliente.contact_email}`} className="email-link">
+                        {cliente.contact_email || '—'}
+                      </a>
+                    </td>
+                    <td className="cell-phone">
+                      <a href={`tel:${cliente.contact_phone}`} className="phone-link">
+                        {cliente.contact_phone || '—'}
+                      </a>
+                    </td>
+                    <td className="cell-address">
+                      <span className="address-text">
+                        📍 {cliente.address || 'No especificada'}
+                      </span>
+                    </td>
+                    <td className="cell-actions">
+                      <div className="action-buttons">
+                        <button 
+                          className="action-btn edit-btn"
+                          onClick={() => abrirEditar(cliente)}
+                          title="Editar cliente"
+                        >
                           ✏️
                         </button>
-                        <button className="action-btn delete" title="Eliminar" onClick={() => eliminarCliente(cliente.id)}>
+                        <button 
+                          className="action-btn delete-btn"
+                          onClick={() => eliminarCliente(cliente.id)}
+                          title="Eliminar cliente"
+                        >
                           🗑️
                         </button>
                       </div>
@@ -211,8 +349,8 @@ export default function Clientes() {
                 ))}
               </tbody>
             </table>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

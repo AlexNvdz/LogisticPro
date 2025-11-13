@@ -1,61 +1,67 @@
-import { Outlet } from "react-router-dom";
-import { NavLink, useLocation, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate, Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
 import "./layout.css";
 
-export default function Layout({ children }) {
+export default function Layout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
-  // --- CAMBIO 1 --- //
   const isadmin = localStorage.getItem("isadmin") === "true";
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-      if (window.innerWidth < 768) setIsSidebarOpen(false);
+      const mobile = window.innerWidth < 768;
+      setIsMobile(mobile);
+      if (mobile) {
+        setIsSidebarOpen(false);
+      } else {
+        setIsSidebarOpen(true);
+      }
     };
+
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // --- CAMBIO 2 ---
+  // Cerrar sidebar al navegar en mobile
+  useEffect(() => {
+    if (isMobile) {
+      setIsSidebarOpen(false);
+    }
+  }, [location.pathname, isMobile]);
+
   const commonItems = [
-    { path: "/", icon: "📊", text: "Dashboard" },
-    { path: "/envios", icon: "📦", text: "Envíos" },
-    { path: "/rutas", icon: "🗺️", text: "Rutas" },
-    { path: "/clientes", icon: "👥", text: "Clientes" },
+    { path: "/", icon: "📊", text: "Dashboard", label: "Inicio" },
+    { path: "/envios", icon: "📦", text: "Envíos", label: "Mis Envíos" },
+    { path: "/rutas", icon: "🗺️", text: "Rutas", label: "Planificación" },
+    { path: "/clientes", icon: "👥", text: "Clientes", label: "Contactos" },
   ];
 
   const adminItems = [
-    { path: "/almacenes", icon: "🏭", text: "Almacenes" },
-    { path: "/conductores", icon: "🚚", text: "Conductores" },
-    { path: "/vehiculos", icon: "🚗", text: "Vehículos" },
+    { path: "/almacenes", icon: "🏭", text: "Almacenes", label: "Gestión" },
+    { path: "/conductores", icon: "🚚", text: "Conductores", label: "Personal" },
+    { path: "/vehiculos", icon: "🚗", text: "Vehículos", label: "Flota" },
   ];
 
   const navigationItems = isadmin ? [...commonItems, ...adminItems] : commonItems;
-  
-  const getPageTitle = () => {
-    const current = [...commonItems, ...adminItems].find(
-      (item) => item.path === location.pathname
-    );
-    return current ? current.text : "Panel de Control";
-  };
 
-  // 🔒 Cerrar sesión
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    // --- CAMBIO 3 ---
     localStorage.removeItem("isadmin");
+    localStorage.removeItem("token");
     navigate("/login");
   };
 
+  const getPageTitle = () => {
+    const item = navigationItems.find((item) => item.path === location.pathname);
+    return item ? item.text : "Dashboard";
+  };
+
   return (
-    <div className="app-container">
-      {/* Fondo para móvil cuando el sidebar está abierto */}
+    <div className={`app-container ${!isSidebarOpen ? "sidebar-closed" : ""}`}>
       {isMobile && isSidebarOpen && (
         <div
           className="sidebar-overlay"
@@ -63,86 +69,187 @@ export default function Layout({ children }) {
         />
       )}
 
-      {/* 🔹 Sidebar */}
+      {/* Sidebar */}
       <aside className={`sidebar ${isSidebarOpen ? "open" : "closed"}`}>
         <div className="sidebar-header">
           <div className="logo-container">
-            <span className="logo-icon">🚚</span>
-            {isSidebarOpen && <h1 className="logo-text">LogisticPro</h1>}
+            <div className="logo-icon-box">🚚</div>
+            {isSidebarOpen && (
+              <div className="logo-text-container">
+                <h1 className="logo-text">LogisticPro</h1>
+                <span className="logo-subtitle">v1.0</span>
+              </div>
+            )}
           </div>
-          <button
-            className="sidebar-toggle"
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          >
-            {isSidebarOpen ? "◀" : "▶"}
-          </button>
+          {isSidebarOpen && (
+            <button
+              className="sidebar-toggle"
+              onClick={() => setIsSidebarOpen(false)}
+              title="Contraer menú"
+            >
+              ◀
+            </button>
+          )}
         </div>
 
+        {/* Navigation Menu */}
         <nav className="nav-menu">
-          {/* --- CAMBIO 4 --- */}
-          {navigationItems.map(({ path, icon, text }) => (
-            <NavLink
-              key={path}
-              to={path}
-              className={({ isActive }) =>
-                `nav-item ${isActive ? "active" : ""}`
-              }
-            >
-              <span className="nav-icon">{icon}</span>
-              {isSidebarOpen && <span className="nav-text">{text}</span>}
-            </NavLink>
-          ))}
+          <div className="nav-section">
+            <span className="nav-section-title">
+              {isSidebarOpen ? "MENÚ PRINCIPAL" : ""}
+            </span>
+            {commonItems.map(({ path, icon, text, label }) => (
+              <NavLink
+                key={path}
+                to={path}
+                end={path === "/"}
+                className={({ isActive }) =>
+                  `nav-item ${isActive ? "active" : ""}`
+                }
+                title={!isSidebarOpen ? text : ""}
+              >
+                <span className="nav-icon">{icon}</span>
+                {isSidebarOpen && (
+                  <div className="nav-text-container">
+                    <span className="nav-text">{text}</span>
+                    <span className="nav-label">{label}</span>
+                  </div>
+                )}
+              </NavLink>
+            ))}
+          </div>
+
+          {isadmin && (
+            <div className="nav-section">
+              <span className="nav-section-title">
+                {isSidebarOpen ? "ADMINISTRACIÓN" : ""}
+              </span>
+              {adminItems.map(({ path, icon, text, label }) => (
+                <NavLink
+                  key={path}
+                  to={path}
+                  className={({ isActive }) =>
+                    `nav-item ${isActive ? "active" : ""}`
+                  }
+                  title={!isSidebarOpen ? text : ""}
+                >
+                  <span className="nav-icon">{icon}</span>
+                  {isSidebarOpen && (
+                    <div className="nav-text-container">
+                      <span className="nav-text">{text}</span>
+                      <span className="nav-label">{label}</span>
+                    </div>
+                  )}
+                </NavLink>
+              ))}
+            </div>
+          )}
         </nav>
 
-        {/* 🔘 Botón de logout */}
-        <div className="logout-section">
-          <button className="logout-btn" onClick={handleLogout}>
-            🚪 {isSidebarOpen && "Cerrar sesión"}
+        {/* Logout Section */}
+        <div className="sidebar-footer">
+          <button 
+            className="logout-btn" 
+            onClick={handleLogout} 
+            title="Cerrar sesión"
+          >
+            <span className="logout-icon">🔒</span>
+            {isSidebarOpen && <span>Cerrar Sesión</span>}
           </button>
         </div>
       </aside>
 
-      {/* 🔹 Contenido principal */}
+      {/* Main Content */}
       <main className="main-content">
-        {/* 🔸 Header superior */}
+        {/* Top Header */}
         <header className="top-header">
           <div className="header-left">
-            {isMobile && (
+            {/* En mobile: mostrar hamburguesa para abrir sidebar */}
+            {isMobile && !isSidebarOpen && (
               <button
                 className="mobile-menu-btn"
                 onClick={() => setIsSidebarOpen(true)}
+                title="Abrir menú"
               >
                 ☰
               </button>
             )}
+            {/* En desktop: mostrar botón expandir cuando sidebar está cerrado */}
+            {!isMobile && !isSidebarOpen && (
+              <button
+                className="expand-sidebar-btn"
+                onClick={() => setIsSidebarOpen(true)}
+                title="Expandir menú"
+              >
+                ▶
+              </button>
+            )}
             <div className="page-title">
               <h2>{getPageTitle()}</h2>
+              <span className="breadcrumb">{isadmin ? "Administrador" : "Usuario"}</span>
             </div>
           </div>
 
           <div className="header-right">
-            <span className="role-label">
-              {/* --- CAMBIO 5 --- */}
-              {isadmin ? "Administrador" : "Usuario"}
-            </span>
-            <button onClick={handleLogout} className="logout-btn-header">
-              Cerrar sesión
-            </button>
-            <img
-              src={`https://ui-avatars.com/api/?name=${
-                // --- CAMBIO 6 ---
-                isadmin ? "Admin" : "User"
-              }&background=1a5d94&color=fff`}
-              alt="User Avatar"
-              className="user-avatar"
-            />
+            <div className="search-bar">
+              <input
+                type="search"
+                placeholder="Buscar envíos, rutas..."
+                className="search-input"
+              />
+              <span className="search-icon">🔍</span>
+            </div>
+
+            <div className="header-actions">
+              <button className="notification-btn" title="Notificaciones">
+                🔔
+                <span className="notification-badge">3</span>
+              </button>
+
+              <div className="user-menu-container">
+                <button
+                  className="user-profile-btn"
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                >
+                  <img
+                    src="https://ui-avatars.com/api/?name=Usuario&background=2563eb&color=fff"
+                    alt="User"
+                    className="user-avatar"
+                  />
+                  <div className="user-info">
+                    <span className="user-name">Usuario</span>
+                    <span className="user-role">
+                      {isadmin ? "Admin" : "Operador"}
+                    </span>
+                  </div>
+                </button>
+
+                {showUserMenu && (
+                  <div className="user-menu-dropdown">
+                    <a href="#profile" className="menu-item">
+                      👤 Mi Perfil
+                    </a>
+                    <a href="#settings" className="menu-item">
+                      ⚙️ Configuración
+                    </a>
+                    <hr className="menu-divider" />
+                    <button
+                      className="menu-item logout-item"
+                      onClick={handleLogout}
+                    >
+                      🚪 Cerrar Sesión
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </header>
 
-        {/* 🔸 Contenido dinámico */}
+        {/* Content Area - AQUÍ RENDERIZA LAS PÁGINAS */}
         <div className="content-wrapper">
           <Outlet />
-        </div> 
+        </div>
       </main>
     </div>
   );
