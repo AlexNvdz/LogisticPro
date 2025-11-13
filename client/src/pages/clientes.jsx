@@ -28,43 +28,44 @@ export default function Clientes() {
   async function crearCliente(e) {
     e.preventDefault();
     try {
-      // Usamos el 'form' state que tiene los campos de cliente
       const res = await apiClient.post('/clients', form);
       const nuevo = res.data;
-      
       setClientes(prev => [nuevo, ...prev]);
-      // Limpiamos el formulario
       setForm({ name: '', contact_email: '', contact_phone: '', address: '' });
       document.getElementById('form-cliente').style.display = 'none';
     } catch (err) {
-      alert('Error creando cliente');
+      console.error("Error creando cliente:", err);
+      // --- CAMBIO AQUÍ ---
+      if (err.response && err.response.status === 403) {
+        alert('No tienes permiso para crear clientes. Solo los administradores pueden.');
+      } else {
+        alert('Error creando cliente.');
+      }
     }
-  }
-
-  function abrirEditar(cliente) {
-    setEditForm({ ...cliente });
-    document.getElementById('form-editar-cliente').style.display = 'block';
   }
 
   async function editarCliente(e) {
     e.preventDefault();
     try {
-      // Creamos el payload solo con los campos de cliente
       const payload = {
         name: editForm.name,
         contact_email: editForm.contact_email,
         contact_phone: editForm.contact_phone,
         address: editForm.address
       };
-      
       const res = await apiClient.put(`/clients/${editForm.id}`, payload);
       const actualizado = res.data;
-      
       setClientes(prev => prev.map(c => c.id === actualizado.id ? actualizado : c));
       setEditForm(null);
       document.getElementById('form-editar-cliente').style.display = 'none';
     } catch (err) {
-      alert('Error editando cliente');
+      console.error("Error editando cliente:", err);
+      // --- CAMBIO AQUÍ ---
+      if (err.response && err.response.status === 403) {
+        alert('No tienes permiso para editar clientes. Solo los administradores pueden.');
+      } else {
+        alert('Error editando cliente.');
+      }
     }
   }
 
@@ -74,7 +75,13 @@ export default function Clientes() {
       await apiClient.delete(`/clients/${id}`);
       setClientes(prev => prev.filter(c => c.id !== id));
     } catch (err) {
-      alert('Error eliminando cliente');
+      console.error("Error eliminando cliente:", err);
+      // --- CAMBIO AQUÍ ---
+      if (err.response && err.response.status === 403) {
+        alert('No tienes permiso para eliminar clientes. Solo los administradores pueden.');
+      } else {
+        alert('Error eliminando cliente.');
+      }
     }
   }
 
