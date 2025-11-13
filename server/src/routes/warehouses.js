@@ -1,6 +1,6 @@
 // server/src/routes/warehouses.js
 const express = require('express');
-const pool = require('../db/connection');
+const { pool } = require('../db/connection'); // <-- ¡CAMBIO AQUÍ!
 const router = express.Router();
 const { authenticateToken, authorizeAdmin } = require('../middleware/authMiddleware');
 

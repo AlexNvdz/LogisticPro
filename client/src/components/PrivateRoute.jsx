@@ -1,16 +1,16 @@
-// src/components/PrivateRoute.jsx
+import React from 'react';
+import { Navigate } from 'react-router-dom';
 
-import { Navigate } from "react-router-dom";
-
-// Este componente REEMPLAZA el que tienes
+// Este componente protege tus rutas
 const PrivateRoute = ({ children }) => {
-  // 1. Revisa si hay un token guardado en el navegador
-  const token = localStorage.getItem("token");
+  
+  // 1. Revisa si hay un token guardado en el localStorage
+  const token = localStorage.getItem('token');
 
   // 2. Si NO hay token...
   if (!token) {
     // 3. ...redirige al usuario a la página de login.
-    // 'replace' evita que pueda volver con el botón de "atrás".
+    // 'replace' evita que pueda volver a esta página con el botón "atrás"
     return <Navigate to="/login" replace />;
   }
 

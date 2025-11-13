@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const pool = require('../db/connection');
+const { pool } = require('../db/connection'); // <-- ¡CAMBIO AQUÍ!
 const { authenticateToken, authorizeAdmin } = require('../middleware/authMiddleware');
 
 // Obtener todos los conductores (solo admins)
