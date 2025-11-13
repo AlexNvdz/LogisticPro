@@ -18,7 +18,7 @@ module.exports = {
   async register(req, res) {
     try {
       // 1. CAMBIO: Buscamos 'isAdmin' en lugar de 'role'
-      const { name, email, password, isAdmin } = req.body;
+      const { name, email, password, isadmin } = req.body;
       if (!name || !email || !password) return res.status(400).json({ error: 'name, email and password are required' });
 
       // validar email único
@@ -35,13 +35,13 @@ module.exports = {
         RETURNING id, name, email, isadmin, created_at
       `;
       // Por defecto, un usuario nuevo no es admin (false)
-      const values = [name, email, isAdmin || false, password_hash];
+      const values = [name, email, isadmin || false, password_hash];
       const { rows } = await pool.query(q, values);
       const user = rows[0];
 
-      // 3. CAMBIO: El token ahora guarda 'isAdmin'
+      // 3. CAMBIO: El token ahora guarda 'isadmin'
       const token = jwt.sign(
-        { userId: user.id, isAdmin: user.isadmin }, // Usamos user.isadmin
+        { userId: user.id, isadmin: user.isadmin }, // Usamos user.isadmin
         JWT_SECRET, 
         { expiresIn: JWT_EXPIRES }
       );
@@ -73,9 +73,9 @@ module.exports = {
       // 4. CAMBIO: safeUser ahora contiene 'isadmin'
       const safeUser = safeUserRow(user); 
       
-      // 5. CAMBIO: El token ahora guarda 'isAdmin'
+      // 5. CAMBIO: El token ahora guarda 'isadmin'
       const token = jwt.sign(
-        { userId: user.id, isAdmin: user.isadmin }, // Usamos user.isadmin
+        { userId: user.id, isadmin: user.isadmin }, // Usamos user.isadmin
         JWT_SECRET, 
         { expiresIn: JWT_EXPIRES }
       );
