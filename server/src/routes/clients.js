@@ -4,11 +4,14 @@ const router = express.Router();
 const ctrl = require('../controllers/clientsController');
 const { authenticateToken, authorizeAdmin, authorizeUser } = require('../middleware/authMiddleware');
 
-// Rutas CRUD base: la ruta base aquí es '/clients' desde server.js
-router.get('/', authenticateToken, authorizeUser, ctrl.getAllClients);       // GET /clients
-router.get('/:id', authenticateToken, authorizeUser, ctrl.getClientById);    // GET /clients/:id
-router.post('/', authenticateToken, authorizeAdmin, ctrl.createClient);       // POST /clients
-router.put('/:id', authenticateToken, authorizeAdmin, ctrl.updateClient);     // PUT /clients/:id
-router.delete('/:id', authenticateToken, authorizeAdmin, ctrl.deleteClient);  // DELETE /clients/:id
+// --- CAMBIOS AQUÍ ---
+// TODOS los usuarios logueados (admin o no) pueden VER clientes
+router.get('/', authenticateToken, authorizeUser, ctrl.getAllClients);
+router.get('/:id', authenticateToken, authorizeUser, ctrl.getClientById);
+
+// SOLO los admins pueden modificar clientes
+router.post('/', authenticateToken, authorizeAdmin, ctrl.createClient);
+router.put('/:id', authenticateToken, authorizeAdmin, ctrl.updateClient);
+router.delete('/:id', authenticateToken, authorizeAdmin, ctrl.deleteClient);
 
 module.exports = router;

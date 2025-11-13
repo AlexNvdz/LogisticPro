@@ -9,8 +9,10 @@ export default function Layout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // 🔐 Rol del usuario
-  const role = localStorage.getItem("role") || "user";
+  // --- CAMBIO 1 ---
+  // Leemos la nueva variable 'isadmin' de localStorage
+  // Como localStorage guarda strings, comparamos con 'true'
+  const isAdmin = localStorage.getItem("isadmin") === "true";
 
   useEffect(() => {
     const handleResize = () => {
@@ -22,20 +24,28 @@ export default function Layout({ children }) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // 🔹 Menú de navegación
-  const navigationItems = [
+  // --- CAMBIO 2 ---
+  // Definimos las rutas que TODOS pueden ver
+  const commonItems = [
     { path: "/", icon: "📊", text: "Dashboard" },
     { path: "/envios", icon: "📦", text: "Envíos" },
     { path: "/rutas", icon: "🗺️", text: "Rutas" },
-    { path: "/almacenes", icon: "🏭", text: "Almacenes" },
-    { path: "/conductores", icon: "🚚", text: "Conductores" },
-    { path: "/vehiculos", icon: "🚗", text: "Vehículos" },
     { path: "/clientes", icon: "👥", text: "Clientes" },
   ];
 
+  // Definimos las rutas que SOLO los ADMINS pueden ver
+  const adminItems = [
+    { path: "/almacenes", icon: "🏭", text: "Almacenes" },
+    { path: "/conductores", icon: "🚚", text: "Conductores" },
+    { path: "/vehiculos", icon: "🚗", text: "Vehículos" },
+  ];
+
+  // El menú final depende de si el usuario es admin o no
+  const navigationItems = isAdmin ? [...commonItems, ...adminItems] : commonItems;
+  
   // 📌 Título de página actual
   const getPageTitle = () => {
-    const current = navigationItems.find(
+    const current = [...commonItems, ...adminItems].find( // Buscamos en todas las rutas
       (item) => item.path === location.pathname
     );
     return current ? current.text : "Panel de Control";
@@ -44,7 +54,9 @@ export default function Layout({ children }) {
   // 🔒 Cerrar sesión
   const handleLogout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("role");
+    // --- CAMBIO 3 ---
+    // Borramos 'isadmin' en lugar de 'role'
+    localStorage.removeItem("isadmin");
     navigate("/login");
   };
 
@@ -74,6 +86,8 @@ export default function Layout({ children }) {
         </div>
 
         <nav className="nav-menu">
+          {/* --- CAMBIO 4 --- */}
+          {/* El 'map' ahora usa la lista filtrada ('navigationItems') */}
           {navigationItems.map(({ path, icon, text }) => (
             <NavLink
               key={path}
@@ -116,14 +130,17 @@ export default function Layout({ children }) {
 
           <div className="header-right">
             <span className="role-label">
-              {role === "admin" ? "Administrador" : "Usuario"}
+              {/* --- CAMBIO 5 --- */}
+              {/* Usamos 'isAdmin' en lugar de 'role' */}
+              {isAdmin ? "Administrador" : "Usuario"}
             </span>
             <button onClick={handleLogout} className="logout-btn-header">
               Cerrar sesión
             </button>
             <img
               src={`https://ui-avatars.com/api/?name=${
-                role === "admin" ? "Admin" : "User"
+                // --- CAMBIO 6 ---
+                isAdmin ? "Admin" : "User"
               }&background=1a5d94&color=fff`}
               alt="User Avatar"
               className="user-avatar"
