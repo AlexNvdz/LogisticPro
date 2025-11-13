@@ -75,10 +75,6 @@ function App() {
           <Route path="vehiculos" element={<Vehiculos />} />
           <Route path="clientes" element={<Clientes />} />
 
-          {/* --- CAMBIO ---
-              La ruta 'usuarios' ahora es una ruta privada normal */}
-          <Route path="usuarios" element={<Usuarios />} />
-
         </Route>
 
         {/* 🚫 Ruta no encontrada */}
