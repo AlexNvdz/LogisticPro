@@ -1,11 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import '../styles/dashboard.css';
-
-// 1. Importamos tu nuevo cliente 'apiClient'
-import apiClient from '../lib/api'; // (Asegúrate que la ruta sea correcta)
-
-// 2. Ya no necesitamos la variable 'API', apiClient la gestiona
-// const API = import.meta.env.VITE_API_URL || 'https://logisticpro.onrender.com';
+import apiClient from '../lib/api'; 
 
 export default function Dashboard() {
   const [counts, setCounts] = useState({
@@ -19,40 +14,50 @@ export default function Dashboard() {
   const pollingRef = useRef(null);
   const [lastUpdate, setLastUpdate] = useState(null);
 
+  // --- CAMBIO 1: Revisamos el rol del usuario ---
+  const isAdmin = localStorage.getItem("isadmin") === "true";
+
   async function fetchCounts() {
     try {
       setLoading(true);
 
-      // 3. Usamos 'apiClient.get' en lugar de 'fetch'.
-      // El token se añade automáticamente gracias al interceptor.
-      const [ordersRes, clientsRes, warehousesRes, driversRes, vehiclesRes] = await Promise.all([
+      // --- CAMBIO 2: Peticiones condicionales ---
+      
+      // Todos los usuarios (admin o no) piden esto:
+      const commonRequests = [
         apiClient.get('/orders'),
-        apiClient.get('/clients'),
+        apiClient.get('/clients')
+      ];
+
+      // Solo los admins piden el resto:
+      const adminRequests = isAdmin ? [
         apiClient.get('/warehouses'),
         apiClient.get('/drivers'),
         apiClient.get('/vehicles'),
-      ]);
+      ] : [];
 
-      // 4. axios pone la respuesta en la propiedad .data
-      // Ya no necesitamos la función 'safeJson'
+      // Unimos las peticiones
+      const allRequests = [...commonRequests, ...adminRequests];
+      const results = await Promise.all(allRequests);
+
+      // Asignamos las respuestas
+      const [ordersRes, clientsRes, warehousesRes, driversRes, vehiclesRes] = results;
+
+      // --- CAMBIO 3: Usamos optional chaining (?.data) ---
+      // Si las respuestas de admin no existen, '?.data' devolverá undefined
+      // y el conteo será 0, sin dar error.
       setCounts({
-        orders: Array.isArray(ordersRes.data) ? ordersRes.data.length : 0,
-        clients: Array.isArray(clientsRes.data) ? clientsRes.data.length : 0,
-        warehouses: Array.isArray(warehousesRes.data) ? warehousesRes.data.length : 0,
-        drivers: Array.isArray(driversRes.data) ? driversRes.data.length : 0,
-        vehicles: Array.isArray(vehiclesRes.data) ? vehiclesRes.data.length : 0,
+        orders: Array.isArray(ordersRes?.data) ? ordersRes.data.length : 0,
+        clients: Array.isArray(clientsRes?.data) ? clientsRes.data.length : 0,
+        warehouses: Array.isArray(warehousesRes?.data) ? warehousesRes.data.length : 0,
+        drivers: Array.isArray(driversRes?.data) ? driversRes.data.length : 0,
+        vehicles: Array.isArray(vehiclesRes?.data) ? vehiclesRes.data.length : 0,
       });
 
       setLastUpdate(new Date().toLocaleString());
     } catch (err) {
+      // Los errores 403 ya no deberían ocurrir, pero dejamos el log
       console.error('Error trayendo datos del dashboard:', err);
-      // Opcional: si el error es 401 (token expirado), podríamos redirigir al login
-      if (err.response && err.response.status === 401) {
-        console.error("Token no válido o expirado. Redirigiendo a login...");
-        // Aquí podrías limpiar localStorage y redirigir
-        // localStorage.clear();
-        // window.location.href = '/login'; 
-      }
     } finally {
       setLoading(false);
     }
@@ -60,11 +65,8 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchCounts();
-
-    // Actualiza cada 10 segundos
     pollingRef.current = setInterval(fetchCounts, 10000);
 
-    // Escucha los cambios locales (por ejemplo, cuando se agrega un cliente o envío)
     function onDataChange() {
       fetchCounts();
     }
@@ -74,15 +76,19 @@ export default function Dashboard() {
       clearInterval(pollingRef.current);
       window.removeEventListener('logistic:data-changed', onDataChange);
     };
-  }, []);
+  }, []); // El 'isAdmin' no cambia, así que no es dependencia
 
-  const data = [
-    { label: 'Envíos Activos', value: counts.orders, sub: 'Total envíos' },
-    { label: 'Clientes', value: counts.clients, sub: 'Total clientes' },
-    { label: 'Almacenes', value: counts.warehouses, sub: 'Total almacenes' },
-    { label: 'Conductores', value: counts.drivers, sub: 'Total conductores' },
-    { label: 'Vehículos', value: counts.vehicles, sub: 'Total vehículos' },
+  // --- CAMBIO 4: Filtramos las tarjetas que se van a mostrar ---
+  const allDataCards = [
+    { label: 'Envíos Activos', value: counts.orders, sub: 'Total envíos', admin: false },
+    { label: 'Clientes', value: counts.clients, sub: 'Total clientes', admin: false },
+    { label: 'Almacenes', value: counts.warehouses, sub: 'Total almacenes', admin: true },
+    { label: 'Conductores', value: counts.drivers, sub: 'Total conductores', admin: true },
+    { label: 'Vehículos', value: counts.vehicles, sub: 'Total vehículos', admin: true },
   ];
+
+  // Mostramos solo las tarjetas comunes, o todas si es admin
+  const data = allDataCards.filter(item => !item.admin || isAdmin);
 
   return (
     <div className="dashboard-page p-4">
@@ -93,6 +99,7 @@ export default function Dashboard() {
         <p>Visualiza el estado general del sistema logístico.</p>
 
         <div className="summary-grid">
+          {/* El .map() ahora usa la 'data' filtrada */}
           {data.map((item) => (
             <div key={item.label} className="stat-card">
               <h4>{item.label}</h4>

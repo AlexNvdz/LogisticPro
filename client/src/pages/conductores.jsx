@@ -1,3 +1,5 @@
+// client/src/pages/conductores.jsx
+
 // const API = ...  <- Eliminado
 
 import React, { useEffect, useState } from "react";
@@ -9,7 +11,7 @@ export default function Conductores() {
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     nombre: "",
-    identificacion: "",
+    identificacion: "", // Este campo no lo usamos en el backend, pero lo dejamos en el form
     telefono: "",
     licencia_conduccion: "",
   });
@@ -19,7 +21,6 @@ export default function Conductores() {
   async function fetchDrivers() {
     setLoading(true);
     try {
-      // CAMBIO: Usamos apiClient.get y accedemos a .data
       const res = await apiClient.get('/drivers');
       setDrivers(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
@@ -31,8 +32,15 @@ export default function Conductores() {
   async function createDriver(e) {
     e.preventDefault();
     try {
-      // CAMBIO: Usamos apiClient.post y accedemos a .data
-      const res = await apiClient.post('/drivers', form);
+      // El backend (que ya arreglamos) espera: nombre, telefono, licencia_conduccion
+      const payload = {
+        nombre: form.nombre,
+        telefono: form.telefono,
+        licencia_conduccion: form.licencia_conduccion
+      };
+      
+      // Enviamos solo el payload que el backend necesita
+      const res = await apiClient.post('/drivers', payload); 
       
       const created = res.data;
       setDrivers((prev) => [created, ...prev]);
@@ -50,47 +58,47 @@ export default function Conductores() {
 
   return (
     <div className="conductores-page">
-      {/* ... Tu JSX (HTML) sigue exactamente igual ... */}
-      {/* ... (No es necesario pegar todo el return de nuevo) ... */}
       <h2 className="page-title">Conductores</h2>
 
-      <div className="conductores-grid">
-        <form onSubmit={createDriver} className="conductores-form">
-          <h3>Agregar conductor</h3>
-          <input placeholder="Nombre" value={form.nombre}
-            onChange={(e) => setForm({ ...form, nombre: e.target.value })} required />
-          <input placeholder="Identificación" value={form.identificacion}
-            onChange={(e) => setForm({ ...form, identificacion: e.target.value })} required />
-          <input placeholder="Teléfono" value={form.telefono}
-            onChange={(e) => setForm({ ...form, telefono: e.target.value })} />
-          <input placeholder="Licencia de conducción" value={form.licencia_conduccion}
-            onChange={(e) => setForm({ ...form, licencia_conduccion: e.target.value })} />
-          <button type="submit">Crear conductor</button>
-        </form>
+      <div className="conductores-grid">
+        <form onSubmit={createDriver} className="conductores-form">
+          <h3>Agregar conductor</h3>
+          <input placeholder="Nombre" value={form.nombre}
+            onChange={(e) => setForm({ ...form, nombre: e.target.value })} required />
+          <input placeholder="Identificación (Opcional)" value={form.identificacion}
+            onChange={(e) => setForm({ ...form, identificacion: e.target.value })} />
+          <input placeholder="Teléfono" value={form.telefono}
+            onChange={(e) => setForm({ ...form, telefono: e.target.value })} />
+          <input placeholder="Licencia de conducción" value={form.licencia_conduccion}
+            onChange={(e) => setForm({ ...form, licencia_conduccion: e.target.value })} />
+          <button type="submit">Crear conductor</button>
+        </form>
 
-        <div className="conductores-list">
-          <h3>Lista de conductores</h3>
-          {loading ? (
-            <div>Cargando...</div>
-          ) : (
-            <div className="conductores-items">
-              {drivers.length === 0 && (
-                <div className="empty">No hay conductores aún</div>
-              )}
-              {drivers.map((d) => (
-                <div key={d.id} className="conductor-card">
-                  <div>
-                    <strong>{d.nombre}</strong>
-                    <div className="conductor-info">ID: {d.identificacion}</div>
-                    <div className="conductor-info">Tel: {d.telefono || "N/A"}</div>
-                    <div className="conductor-info">Licencia: {d.licencia_conduccion || "N/A"}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
+        <div className="conductores-list">
+          <h3>Lista de conductores</h3>
+          {loading ? (
+            <div>Cargando...</div>
+          ) : (
+            <div className="conductores-items">
+              {drivers.length === 0 && (
+                <div className="empty">No hay conductores aún</div>
+              )}
+              {/* --- CAMBIOS AQUÍ --- */}
+              {/* Usamos los nombres de la base de datos (name, id, phone, license_number) */}
+              {drivers.map((d) => (
+                <div key={d.id} className="conductor-card">
+                  <div>
+                    <strong>{d.name}</strong>
+                    <div className="conductor-info">ID: {d.id}</div>
+                    <div className="conductor-info">Tel: {d.phone || "N/A"}</div>
+                    <div className="conductor-info">Licencia: {d.license_number || "N/A"}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
