@@ -24,7 +24,7 @@ export const authorizeAdmin = (req, res, next) => {
   // --- CAMBIO ---
   // Antes: req.user.role !== 'admin'
   // Ahora: !req.user.isAdmin (Si "isAdmin" NO es true)
-  if (!req.user.isAdmin) {
+  if (!req.user.isadmin) {
     return res.status(403).json({ message: 'Acceso restringido a administradores' });
   }
   
