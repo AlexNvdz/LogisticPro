@@ -10,31 +10,34 @@ export default function Login() {
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-  e.preventDefault();
-  try {
-    const res = await axios.post("https://logisticpro.onrender.com/auth/login", {
-      email,
-      password,
-    });
+    e.preventDefault();
+    try {
+      const res = await axios.post("https://logisticpro.onrender.com/auth/login", {
+        email,
+        password,
+      });
 
-    console.log("🟩 Login response:", res.data);
+      console.log("🟩 Login response:", res.data);
 
-    // ✅ Asegúrate de extraer correctamente el rol según la estructura del backend
-    const token = res.data.token;
-    // Ya no guardamos el 'role'
+      const token = res.data.token;
+      
+      // --- CAMBIO 1: Leer 'isadmin' de la respuesta ---
+      // (Usamos '?? false' por si acaso el backend no lo envía)
+      const isadmin = res.data.user?.isadmin ?? false;
 
-    localStorage.setItem("token", token);
-    // Ya no guardamos el 'role'
+      // --- CAMBIO 2: Guardar 'isadmin' en localStorage ---
+      localStorage.setItem("token", token);
+      localStorage.setItem("isadmin", isadmin); // (Usamos 'isadmin' minúscula)
 
-    console.log("✅ Token guardado:", token); // 👈 ASÍ QUEDA
+      // --- CAMBIO 3: Actualizar el log ---
+      console.log("✅ Token y Admin status guardados:", token, isadmin);
 
-    navigate("/");
-  } catch (err) {
-    console.error("❌ Error al iniciar sesión:", err);
-    setError("Correo o contraseña incorrectos");
-  }
-};
-
+      navigate("/");
+    } catch (err) {
+      console.error("❌ Error al iniciar sesión:", err);
+      setError("Correo o contraseña incorrectos");
+    }
+  };
 
   return (
     <div className="login-container">
