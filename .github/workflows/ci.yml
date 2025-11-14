@@ -28,3 +28,24 @@ jobs:
         run: |
           cd client
           npm run build
+
+          
+      - name: 4. (Backend) Run Tests & Coverage
+        run: npm run test:coverage # Corre 'jest --coverage'
+        working-directory: ./server
+        env:
+          # Variables falsas para que Jest corra
+          JWT_SECRET: "test-secret" 
+          DB_USER: "test"
+          DB_HOST: "test"
+          DB_DATABASE: "test"
+          DB_PASSWORD: "test"
+          DB_PORT: "5432"
+
+      - name: 5. (Frontend) Run Tests & Coverage
+        run: npm run coverage # Corre 'vitest run --coverage'
+        working-directory: ./client
+        
+      - name: 6. Build frontend (Paso original de tu compañero)
+        run: npm run build
+        working-directory: ./client
