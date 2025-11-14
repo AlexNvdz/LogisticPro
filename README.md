@@ -229,14 +229,14 @@ npm install
 
 ```powershell
 cd server
-npm test
+npm run test:corevage
 ```
 
 - Frontend (Vitest) — si no existe el script `test` en `client/package.json`, usar `npx` directamente:
 
 ```powershell
 cd client
-npx vitest
+npm run corevage
 ```
 
 ---
