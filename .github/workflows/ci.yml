@@ -28,3 +28,4 @@ jobs:
         run: |
           cd client
           npm run build
+          //// Aquí puedes agregar comandos para probar la build si es necesario
