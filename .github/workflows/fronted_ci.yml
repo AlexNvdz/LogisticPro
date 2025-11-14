@@ -1,0 +1,34 @@
+name: Frontend (React) CI Pipeline
+
+on:
+  push:
+    branches: [ "main" ] # Se activa en push a main
+  pull_request:
+    branches: [ "main" ] # Se activa al crear un Pull Request
+
+jobs:
+  test-and-build-frontend:
+    runs-on: ubuntu-latest
+    
+    # Le decimos que trabaje en la carpeta 'client'
+    defaults:
+      run:
+        working-directory: ./client
+
+    steps:
+    - name: 1. Checkout (Descargar código)
+      uses: actions/checkout@v3
+
+    - name: 2. Setup Node.js v18
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: 3. Install Dependencies (npm install)
+      run: npm install
+
+    - name: 4. Run Tests & Coverage (Vitest)
+      run: npm run coverage # Corre 'vitest run --coverage'
+
+    - name: 5. Build Project (npm run build)
+      run: npm run build
