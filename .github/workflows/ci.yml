@@ -1,4 +1,4 @@
-name: CI
+name: CI (Build & Test Pipeline)
 
 on:
   push:
@@ -7,24 +7,44 @@ on:
     branches: ["main"]
 
 jobs:
-  test-build:
+  test-and-build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: 1. Checkout (Descargar código)
         uses: actions/checkout@v3
 
-      - name: Setup Node.js
+      - name: 2. Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      - name: Install dependencies
-        run: |
-          cd client && npm install
-          cd ../server && npm install
+      # --- PASOS DEL FRONTEND ---
+      - name: 3. (Frontend) Install Dependencies
+        run: npm install
+        working-directory: ./client # Especifica que corra en 'client'
 
-      - name: Build frontend
-        run: |
-          cd client
-          npm run build
+      - name: 4. (Frontend) Run Tests & Coverage
+        run: npm run coverage # Corre 'vitest run --coverage'
+        working-directory: ./client
+
+      - name: 5. (Frontend) Build Project
+        run: npm run build # Mantenemos el build que tenía tu compañero
+        working-directory: ./client
+
+      # --- PASOS DEL BACKEND ---
+      - name: 6. (Backend) Install Dependencies
+        run: npm install
+        working-directory: ./server
+
+      - name: 7. (Backend) Run Tests & Coverage
+        run: npm run test:coverage # Corre 'jest --coverage'
+        working-directory: ./server
+        env:
+          # Añadimos variables de entorno FALSAS para que el test corra
+          JWT_SECRET: "un-secreto-de-prueba-para-ci" 
+          DB_USER: "test"
+          DB_HOST: "test"
+          DB_DATABASE: "test"
+          DB_PASSWORD: "test"
+          DB_PORT: "5432"

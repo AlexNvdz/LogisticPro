@@ -27,4 +27,14 @@ export default defineConfig({
       '/drivers': 'http://localhost:3000',
     },
   },
+  
+  // --- AÑADIDO ---
+  // Esta es la única sección nueva.
+  // Le dice a Vite cómo manejar las pruebas.
+  test: {
+    globals: true, // No necesitas importar 'test', 'expect', etc.
+    environment: 'jsdom', // Simula un navegador
+    setupFiles: './src/setupTests.js', // Archivo de configuración
+  },
+  // --- FIN DE LO AÑADIDO ---
 })
