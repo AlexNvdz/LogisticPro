@@ -9,26 +9,21 @@ const pool = require('./src/db/connection');
 const app = express();
 
 // --- 2. INICIALIZAR SENTRY (Antes de cualquier middleware) ---
-// Solo se activa si existe la variable SENTRY_DSN en el .env
 if (process.env.SENTRY_DSN) {
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
     integrations: [
       Sentry.httpIntegration(),
-      Sentry.expressIntegration({ app }),
+      // En v8, esta línea se encarga del requestHandler y tracingHandler automáticamente
+      Sentry.expressIntegration({ app }), 
       nodeProfilingIntegration(),
     ],
-    // En producción real, baja esto a 0.1 o 0.01.
     tracesSampleRate: 1.0, 
     profilesSampleRate: 1.0,
   });
-
-  // El manejador de peticiones 
-  app.use(Sentry.Handlers.requestHandler());
-  // El manejador de tracing seguido al requestHandler
-  app.use(Sentry.Handlers.tracingHandler());
   
   console.log("✅ Sentry inicializado correctamente.");
+  
 } else {
   console.log("⚠️ Sentry no inicializado: Falta SENTRY_DSN en .env");
 }
@@ -38,8 +33,8 @@ app.use(express.json());
 app.use(
   cors({
     origin: [
-      "https://logistic-pro.vercel.app", // tu frontend en producción
-      "http://localhost:5173" // tu entorno local de desarrollo
+      "https://logistic-pro.vercel.app", 
+      "http://localhost:5173"
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     credentials: true
@@ -75,18 +70,18 @@ app.get('/db-test', async (req, res) => {
   }
 });
 
-// Ruta para PROBAR que Sentry funciona (crashea a propósito)
+// Ruta para PROBAR que Sentry funciona
 app.get("/debug-sentry", function mainHandler(req, res) {
   throw new Error("¡Error de prueba para Sentry!");
 });
 
-// --- 3. HANDLER DE ERRORES DE SENTRY (Después de todas las rutas) ---
+// --- 3. HANDLER DE ERRORES DE SENTRY ---
+// En v8 se usa setupExpressErrorHandler
 if (process.env.SENTRY_DSN) {
-  app.use(Sentry.Handlers.errorHandler());
+  Sentry.setupExpressErrorHandler(app);
 }
 
-
-module.exports = app; // <<=== NECESARIO para los tests
+module.exports = app; 
 
 if (process.env.NODE_ENV !== 'test') {
   const PORT = process.env.PORT || 3000;
