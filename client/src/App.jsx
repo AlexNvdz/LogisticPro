@@ -11,10 +11,17 @@ import PrivateRoute from "./components/PrivateRoute";
 import Login from "./pages/login";
 import Register from "./pages/register";
 import "./App.css";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
 
 function App() {
   return (
     <BrowserRouter>
+
+      {/* Herramientas de monitoreo de Vercel */}
+      <Analytics />
+      <SpeedInsights />
+      <Sentry.ErrorBoundary fallback={"An error has occurred"}></Sentry.ErrorBoundary>
       <Routes>
         {/* Rutas públicas */}
         <Route path="/login" element={<Login />} />
