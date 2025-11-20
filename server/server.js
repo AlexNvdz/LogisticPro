@@ -14,10 +14,8 @@ if (process.env.SENTRY_DSN) {
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
     integrations: [
-      // Habilita el rastreo HTTP (tracing)
-      new Sentry.Integrations.Http({ tracing: true }),
-      // Habilita el rastreo de Express
-      new Sentry.Integrations.Express({ app }),
+      Sentry.httpIntegration(),
+      Sentry.expressIntegration({ app }),
       nodeProfilingIntegration(),
     ],
     // En producción real, baja esto a 0.1 o 0.01.
