@@ -14,39 +14,44 @@ import "./App.css";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
 
+// ✅ AGREGA ESTA LÍNEA: Importar Sentry aquí también
+import * as Sentry from "@sentry/react";
+
 function App() {
   return (
     <BrowserRouter>
-
       {/* Herramientas de monitoreo de Vercel */}
       <Analytics />
       <SpeedInsights />
-      <Sentry.ErrorBoundary fallback={"An error has occurred"}></Sentry.ErrorBoundary>
-      <Routes>
-        {/* Rutas públicas */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
 
-        {/* Rutas privadas con Layout */}
-        <Route
-          element={
-            <PrivateRoute>
-              <Layout />
-            </PrivateRoute>
-          }
-        >
-          <Route index element={<Dashboard />} />
-          <Route path="envios" element={<Envios />} />
-          <Route path="rutas" element={<Rutas />} />
-          <Route path="almacenes" element={<Almacenes />} />
-          <Route path="conductores" element={<Conductores />} />
-          <Route path="vehiculos" element={<Vehiculos />} />
-          <Route path="clientes" element={<Clientes />} />
-        </Route>
+      {/* ✅ CORRECCIÓN: El ErrorBoundary debe envolver las Rutas para protegerlas */}
+      <Sentry.ErrorBoundary fallback={<p>An error has occurred</p>}>
+        <Routes>
+          {/* Rutas públicas */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
 
-        {/* Ruta no encontrada */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+          {/* Rutas privadas con Layout */}
+          <Route
+            element={
+              <PrivateRoute>
+                <Layout />
+              </PrivateRoute>
+            }
+          >
+            <Route index element={<Dashboard />} />
+            <Route path="envios" element={<Envios />} />
+            <Route path="rutas" element={<Rutas />} />
+            <Route path="almacenes" element={<Almacenes />} />
+            <Route path="conductores" element={<Conductores />} />
+            <Route path="vehiculos" element={<Vehiculos />} />
+            <Route path="clientes" element={<Clientes />} />
+          </Route>
+
+          {/* Ruta no encontrada */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Sentry.ErrorBoundary>
     </BrowserRouter>
   );
 }
